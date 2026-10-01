@@ -1,0 +1,31 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# Allow required native/postinstall builds (Prisma, sharp, argon2, etc).
+# Placeholder strings here break `pnpm install --frozen-lockfile` on Vercel.
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/client': true
+  '@prisma/engines': true
+  '@scarf/scarf': true
+  argon2: true
+  core-js: true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - argon2
+  - core-js
+  - esbuild
+  - prisma
+  - protobufjs
+  - sharp
+  - unrs-resolver

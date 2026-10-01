@@ -1,0 +1,49 @@
+---
+description: Prisma schema and database conventions for SafeScribe multi-tenant architecture
+globs: prisma/**/*
+alwaysApply: false
+---
+
+# SafeScribe Database (Prisma + PostgreSQL)
+
+## Multi-Tenant Rules
+
+- `Tenant` (organization) is the isolation boundary.
+- Every tenant-owned model includes `tenantId String` + `tenant Tenant @relation(...)`.
+- Composite indexes: `@@index([tenantId, createdAt])`, `@@index([tenantId, status])` on list tables.
+- Super Admin platform records may omit `tenantId` where appropriate (e.g., platform settings).
+
+## Core Models (Phase 1–3)
+
+`Tenant`, `User`, `Role`, `Permission`, `RolePermission`, `UserRole`, `Session`, `RefreshToken`, `MfaSecret`, `AuditLog`, `LoginHistory`.
+
+User fields: email (unique per tenant or globally — pick one, document it), passwordHash, status (`ACTIVE` | `SUSPENDED` | `PENDING`), failedLoginAttempts, lockedUntil, emailVerifiedAt, lastLoginAt.
+
+## Conventions
+
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  email     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, email])
+  @@index([tenantId, status])
+}
+```
+
+- IDs: `@default(cuid())` for strings; relations on both sides.
+- Timestamps: `createdAt` + `updatedAt` on all entities.
+- Soft delete: prefer `deletedAt DateTime?` over hard delete for users/tenants.
+- AuditLog: append-only, never update/delete.
+
+## Seeds
+
+Seed script must create: Super Admin (static env credentials), sample tenant, Pharmacist Admin, Pharmacist, default roles/permissions.
+
+## Migrations
+
+One migration per logical change. Run `prisma migrate dev` locally; never edit applied migration SQL.

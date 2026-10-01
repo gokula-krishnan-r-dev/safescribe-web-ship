@@ -1,0 +1,3070 @@
+{
+  "ranAt": "2026-08-09T03:21:16.606Z",
+  "api": "https://api-staging.safescribe.ca/api/v1",
+  "release": "KR-2026.08.09.37",
+  "cacheRules": 810,
+  "passed": 10,
+  "total": 10,
+  "results": [
+    {
+      "id": "TC-01",
+      "title": "Direct allergy + renal + metformin lab",
+      "ok": true,
+      "layer": "mixed",
+      "checks": [
+        {
+          "name": "engine:Docosanol 10% cream→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Docosanol."
+        },
+        {
+          "name": "engine:Valacyclovir→CAUTION",
+          "ok": true,
+          "detail": "The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with "
+        },
+        {
+          "name": "engine:Acyclovir→CAUTION",
+          "ok": true,
+          "detail": "The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:metformin critical review",
+          "ok": true,
+          "detail": "metformin finding present"
+        },
+        {
+          "name": "consult:Docosanol 10% Cream (Abreva®, generics)→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Docosanol."
+        },
+        {
+          "name": "consult:Valacyclovir (Valtrex®, generics)→CAUTION",
+          "ok": true,
+          "detail": "The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with "
+        },
+        {
+          "name": "consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "consult:Acyclovir Oral (Zovirax®, generics)→CAUTION",
+          "ok": true,
+          "detail": "The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        }
+      ],
+      "summary": "Docosanol blocked; systemic antivirals cautioned; topical acyclovir allowed",
+      "findingsSample": [
+        "allergy/HIGH: Patient has a recorded allergy to Docosanol.",
+        "renal_band/CRITICAL: The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indicati",
+        "renal_band/CRITICAL: The patient's verified eGFR is below 30 mL/min/1.73 m2. Do not proceed with metformin; review and do",
+        "renal_band/MODERATE: The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and"
+      ]
+    },
+    {
+      "id": "TC-02",
+      "title": "Acyclovir allergy cross-reactivity to valacyclovir",
+      "ok": true,
+      "layer": "mixed",
+      "checks": [
+        {
+          "name": "engine:Acyclovir→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "engine:Valacyclovir→BLOCK",
+          "ok": true,
+          "detail": "Valacyclovir is a prodrug of acyclovir. A confirmed severe acyclovir allergy blocks valacyclovir."
+        },
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Famciclovir→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "consult:Acyclovir Oral (Zovirax®, generics)→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→BLOCK",
+          "ok": true,
+          "detail": "Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "consult:Valacyclovir (Valtrex®, generics)→BLOCK",
+          "ok": true,
+          "detail": "Valacyclovir is a prodrug of acyclovir. A confirmed severe acyclovir allergy blocks valacyclovir."
+        },
+        {
+          "name": "consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "Acyclovir family + valacyclovir blocked; docosanol/famciclovir allowed",
+      "findingsSample": [
+        "allergy: Acyclovir — Patient has a recorded allergy to Acyclovir.",
+        "allergy: Acyclovir 5% cream — Patient has a recorded allergy to Acyclovir.",
+        "cross_reactivity: Valacyclovir — Valacyclovir is a prodrug of acyclovir. A confirmed severe acyclovir allergy blo"
+      ]
+    },
+    {
+      "id": "TC-03",
+      "title": "Clopidogrel DDI with omeprazole/esomeprazole",
+      "ok": true,
+      "layer": "mixed",
+      "checks": [
+        {
+          "name": "engine:Omeprazole→CAUTION",
+          "ok": true,
+          "detail": "Omeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid suppressant such as pantoprazole or famotidine."
+        },
+        {
+          "name": "engine:Esomeprazole→CAUTION",
+          "ok": true,
+          "detail": "Esomeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid suppressant such as pantoprazole or famotidine."
+        },
+        {
+          "name": "engine:Pantoprazole→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Famotidine→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "Omeprazole/esomeprazole cautioned with clopidogrel; pantoprazole/famotidine allowed",
+      "findingsSample": [
+        "drug_interaction: Omeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid",
+        "drug_interaction: Esomeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative ac"
+      ]
+    },
+    {
+      "id": "TC-04",
+      "title": "Active peptic ulcer blocks NSAIDs",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "Active peptic ulcer disease matches the governed condition rule and the selected medication is in the published systemic NSAID value set. Select an alternative "
+        },
+        {
+          "name": "engine:Naproxen→BLOCK",
+          "ok": true,
+          "detail": "Active peptic ulcer disease matches the governed condition rule and the selected medication is in the published systemic NSAID value set. Select an alternative "
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Amoxicillin→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "NSAIDs blocked for peptic ulcer; acetaminophen/antibiotic allowed (engine harness; no AOM pathway)",
+      "findingsSample": [
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th",
+        "drug_disease: Active peptic ulcer disease matches the governed condition rule and the selected medication is in th"
+      ]
+    },
+    {
+      "id": "TC-05",
+      "title": "Renal CrCl 25 — adjust valacyclovir, spare topical",
+      "ok": true,
+      "layer": "mixed",
+      "checks": [
+        {
+          "name": "engine:Valacyclovir→CAUTION",
+          "ok": true,
+          "detail": "The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with "
+        },
+        {
+          "name": "engine:Acyclovir→CAUTION",
+          "ok": true,
+          "detail": "The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "consult:Valacyclovir (Valtrex®, generics)→CAUTION",
+          "ok": true,
+          "detail": "The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with "
+        },
+        {
+          "name": "consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "Systemic antivirals cautioned at CrCl 25; topicals allowed",
+      "findingsSample": [
+        "renal_band/CRITICAL: The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indicati",
+        "renal_band/MODERATE: The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and"
+      ]
+    },
+    {
+      "id": "TC-06",
+      "title": "Potassium 5.8 blocks spironolactone increase",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Spironolactone→BLOCK",
+          "ok": true,
+          "detail": "The current serum or plasma potassium result is above the reporting laboratory's upper reference limit. Do not proceed with spironolactone until the result and "
+        },
+        {
+          "name": "engine:Benzoyl peroxide→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Clindamycin→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "Spironolactone blocked at K 5.8; topicals allowed (engine harness)",
+      "findingsSample": [
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim",
+        "renal_lab: The current serum or plasma potassium result is above the reporting laboratory's upper reference lim"
+      ]
+    },
+    {
+      "id": "TC-07",
+      "title": "Pregnancy blocks ACE inhibitor renewal",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ramipril→BLOCK",
+          "ok": true,
+          "detail": "A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immediate prescriber review."
+        },
+        {
+          "name": "engine:Lisinopril→BLOCK",
+          "ok": true,
+          "detail": "A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immediate prescriber review."
+        },
+        {
+          "name": "engine:Amlodipine→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "ACEIs blocked in pregnancy; amlodipine not auto-blocked (engine harness)",
+      "findingsSample": [
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia",
+        "pregnancy: A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immedia"
+      ]
+    },
+    {
+      "id": "TC-08",
+      "title": "Breastfeeding blocks codeine combinations",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→BLOCK",
+          "ok": true,
+          "detail": "Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occur in a breastfed infant."
+        },
+        {
+          "name": "engine:Tylenol with Codeine No. 3→BLOCK",
+          "ok": true,
+          "detail": "Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occur in a breastfed infant."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true
+        },
+        {
+          "name": "engine:Ibuprofen→ALLOWED",
+          "ok": true
+        }
+      ],
+      "summary": "Codeine products blocked in lactation; plain acetaminophen/ibuprofen allowed",
+      "findingsSample": [
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ",
+        "lactation: Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occ"
+      ]
+    },
+    {
+      "id": "TC-09",
+      "title": "Age 11 — adult cold-sore products ineligible",
+      "ok": true,
+      "layer": "consultation",
+      "checks": [
+        {
+          "name": "consult:age gating for under-12",
+          "ok": true,
+          "detail": "cards=11, blockedOrSupportive=true"
+        }
+      ],
+      "summary": "Under-12 cold sore treatments gated"
+    },
+    {
+      "id": "TC-10",
+      "title": "Ocular red flag + immunocompromised → urgent referral",
+      "ok": true,
+      "layer": "red_flags",
+      "checks": [
+        {
+          "name": "pathway:ocular red flag exists",
+          "ok": true,
+          "detail": "found"
+        },
+        {
+          "name": "pathway:immunocompromised red flag exists",
+          "ok": true,
+          "detail": "found"
+        },
+        {
+          "name": "red-flags:screen endpoint",
+          "ok": true,
+          "detail": "HTTP 200"
+        },
+        {
+          "name": "consult:treatment cards after urgent referral intent",
+          "ok": true,
+          "detail": "11 cards returned (referral short-circuit is UI/workflow; API still lists catalog)"
+        }
+      ],
+      "summary": "Cold sore pathway has ocular + immunocompromised red flags for referral workflow"
+    }
+  ],
+  "repoRun": {
+    "status": 200,
+    "data": {
+      "runId": "run-1786245675933",
+      "total": 100,
+      "passed": 24,
+      "failed": 76,
+      "criticalFailed": 62,
+      "highFailed": 14,
+      "results": [
+        {
+          "testCaseId": "TC-ACR-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-AMOX-CEFADROXIL-IMM but no findings",
+            "POSITIVE_MATCH allergy scenario produced no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-ACR-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-ACR-004",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-DDI-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-PDE5-NITRATE but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-DDI-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-VKA-NSAID but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-DDI-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-DDI-004",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-DDX-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-DDX-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDX-SUMATRIPTAN-UNCONTROLLED-HTN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-LAB-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-LAB-ACEI-POTASSIUM-HIGH but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-LAB-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-LAC-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CODEINE-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred."
+            ],
+            "ruleEffects": [
+              "LAC-CODEINE-001",
+              "LAC-CODEINE-001-TV001",
+              "LAC-CODEINE-001-TV011",
+              "LAC-CODEINE-001-TV021",
+              "LAC-CODEINE-001-TV031",
+              "LAC-CODEINE-001-TV041",
+              "LAC-CODEINE-001-TV051",
+              "LAC-CODEINE-001-TV061",
+              "LAC-CODEINE-001-TV071",
+              "LAC-CODEINE-001-TV081"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-LAC-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10",
+            "expected_deduplicated_finding_count=0 actual=10",
+            "expected_alert_severity=NONE actual=LOW"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-PLAT-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-PLAT-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-PLAT-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=1",
+            "expected_deduplicated_finding_count=0 actual=1",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-PREG-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-30PLUS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-PREG-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=9",
+            "expected_deduplicated_finding_count=0 actual=9",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 9,
+            "deduplicatedFindingCount": 9,
+            "primaryRuleCode": "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+            "severities": [
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER"
+            ],
+            "ruleEffects": [
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV003",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV014",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV025",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV036",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV047",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV058",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV069",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV080"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-REN-001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-LT30 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-REN-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-30-44 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-REN-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-REN-004",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=2 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-SITAGLIPTIN-DIALYSIS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0001",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-AMOX-CEFADROXIL-IMM but no findings",
+            "POSITIVE_MATCH allergy scenario produced no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0004",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0005",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-PDE5-NITRATE but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0006",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-VKA-NSAID but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0007",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0008",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0009",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0011",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDX-SUMATRIPTAN-UNCONTROLLED-HTN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0012",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-LT30 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0013",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-30-44 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0014",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0015",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=2 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-SITAGLIPTIN-DIALYSIS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0016",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-LAB-ACEI-POTASSIUM-HIGH but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0018",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0019",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-30PLUS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0020",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=9",
+            "expected_deduplicated_finding_count=0 actual=9",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 9,
+            "deduplicatedFindingCount": 9,
+            "primaryRuleCode": "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+            "severities": [
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER"
+            ],
+            "ruleEffects": [
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV003",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV014",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV025",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV036",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV047",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV058",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV069",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV080"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0022",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CODEINE-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred."
+            ],
+            "ruleEffects": [
+              "LAC-CODEINE-001",
+              "LAC-CODEINE-001-TV001",
+              "LAC-CODEINE-001-TV011",
+              "LAC-CODEINE-001-TV021",
+              "LAC-CODEINE-001-TV031",
+              "LAC-CODEINE-001-TV041",
+              "LAC-CODEINE-001-TV051",
+              "LAC-CODEINE-001-TV061",
+              "LAC-CODEINE-001-TV071",
+              "LAC-CODEINE-001-TV081"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0024",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10",
+            "expected_deduplicated_finding_count=0 actual=10",
+            "expected_alert_severity=NONE actual=LOW"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0026",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0027",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0028",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=1",
+            "expected_deduplicated_finding_count=0 actual=1",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0029",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-AMOX-CEFADROXIL-IMM but no findings",
+            "POSITIVE_MATCH allergy scenario produced no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0031",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0032",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0033",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-PDE5-NITRATE but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0034",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-VKA-NSAID but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0035",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0036",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0037",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0039",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDX-SUMATRIPTAN-UNCONTROLLED-HTN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0040",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-LT30 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0041",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-30-44 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0042",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0043",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=2 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-SITAGLIPTIN-DIALYSIS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0044",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-LAB-ACEI-POTASSIUM-HIGH but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0046",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0047",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-30PLUS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0048",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=9",
+            "expected_deduplicated_finding_count=0 actual=9",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 9,
+            "deduplicatedFindingCount": 9,
+            "primaryRuleCode": "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+            "severities": [
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL",
+              "CRITICAL"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER",
+              "CONTRAINDICATED_DO_NOT_USE_AND_CONTACT_PRESCRIBER"
+            ],
+            "ruleEffects": [
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV003",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV014",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV025",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV036",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV047",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV058",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV069",
+              "SS-PREG-SYSTEMIC-RETINOIDS-ANY-TV080"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0050",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CODEINE-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred.",
+              "Do not select codeine while breastfeeding; choose a non-codeine alternative and assess the infant if exposure has occurred."
+            ],
+            "ruleEffects": [
+              "LAC-CODEINE-001",
+              "LAC-CODEINE-001-TV001",
+              "LAC-CODEINE-001-TV011",
+              "LAC-CODEINE-001-TV021",
+              "LAC-CODEINE-001-TV031",
+              "LAC-CODEINE-001-TV041",
+              "LAC-CODEINE-001-TV051",
+              "LAC-CODEINE-001-TV061",
+              "LAC-CODEINE-001-TV071",
+              "LAC-CODEINE-001-TV081"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0052",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10",
+            "expected_deduplicated_finding_count=0 actual=10",
+            "expected_alert_severity=NONE actual=LOW"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0054",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0055",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0056",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=1",
+            "expected_deduplicated_finding_count=0 actual=1",
+            "expected_alert_severity=NONE actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0057",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-AMOX-CEFADROXIL-IMM but no findings",
+            "POSITIVE_MATCH allergy scenario produced no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0059",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0060",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0061",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-PDE5-NITRATE but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0062",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDI-VKA-NSAID but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0063",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0064",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_alert_severity=HIGH actual=CRITICAL"
+          ],
+          "actual": {
+            "rawMatchCount": 1,
+            "deduplicatedFindingCount": 1,
+            "primaryRuleCode": "SS-DDI-WARFARIN-CLARITHROMYCIN",
+            "severities": [
+              "CRITICAL"
+            ],
+            "actions": [
+              "COORDINATE_AND_MONITOR"
+            ],
+            "ruleEffects": [
+              "SS-DDI-WARFARIN-CLARITHROMYCIN"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0065",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_deduplicated_finding_count=1 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0067",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-DDX-SUMATRIPTAN-UNCONTROLLED-HTN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0068",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-LT30 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0069",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-METFORMIN-EGFR-30-44 but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0070",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0071",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=2 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-REN-SITAGLIPTIN-DIALYSIS but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0072",
+          "suiteVersion": "1.0-draft",
+          "priority": "P0",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_deduplicated_finding_count=1 actual=0",
+            "expected_primary_rule_code=SS-LAB-ACEI-POTASSIUM-HIGH but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-ACR-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-PEN-CEPH-UNKNOWN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-DDX-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-LAB-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-LAC-002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-LAC-004",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CABERGOLINE-SUPPLY-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended."
+            ],
+            "ruleEffects": [
+              "LAC-CABERGOLINE-SUPPLY-001",
+              "LAC-CABERGOLINE-SUPPLY-001-TV010",
+              "LAC-CABERGOLINE-SUPPLY-001-TV020",
+              "LAC-CABERGOLINE-SUPPLY-001-TV030",
+              "LAC-CABERGOLINE-SUPPLY-001-TV040",
+              "LAC-CABERGOLINE-SUPPLY-001-TV050",
+              "LAC-CABERGOLINE-SUPPLY-001-TV060",
+              "LAC-CABERGOLINE-SUPPLY-001-TV070",
+              "LAC-CABERGOLINE-SUPPLY-001-TV080",
+              "LAC-CABERGOLINE-SUPPLY-001-TV090"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-PREG-003",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-UNKNOWN-GA but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0002",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-PEN-CEPH-UNKNOWN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0010",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0017",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0021",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-UNKNOWN-GA but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0023",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0025",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CABERGOLINE-SUPPLY-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended."
+            ],
+            "ruleEffects": [
+              "LAC-CABERGOLINE-SUPPLY-001",
+              "LAC-CABERGOLINE-SUPPLY-001-TV010",
+              "LAC-CABERGOLINE-SUPPLY-001-TV020",
+              "LAC-CABERGOLINE-SUPPLY-001-TV030",
+              "LAC-CABERGOLINE-SUPPLY-001-TV040",
+              "LAC-CABERGOLINE-SUPPLY-001-TV050",
+              "LAC-CABERGOLINE-SUPPLY-001-TV060",
+              "LAC-CABERGOLINE-SUPPLY-001-TV070",
+              "LAC-CABERGOLINE-SUPPLY-001-TV080",
+              "LAC-CABERGOLINE-SUPPLY-001-TV090"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0030",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-PEN-CEPH-UNKNOWN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0038",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0045",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0049",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=PREG-NSAID-UNKNOWN-GA but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0051",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": true,
+          "failures": [],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-DOXYCYCLINE-SHORT-001",
+            "severities": [
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW",
+              "LOW"
+            ],
+            "actions": [
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy.",
+              "Allow after confirming a short course; counsel and avoid automatically applying this row to prolonged or repeated therapy."
+            ],
+            "ruleEffects": [
+              "LAC-DOXYCYCLINE-SHORT-001",
+              "LAC-DOXYCYCLINE-SHORT-001-TV009",
+              "LAC-DOXYCYCLINE-SHORT-001-TV019",
+              "LAC-DOXYCYCLINE-SHORT-001-TV029",
+              "LAC-DOXYCYCLINE-SHORT-001-TV039",
+              "LAC-DOXYCYCLINE-SHORT-001-TV049",
+              "LAC-DOXYCYCLINE-SHORT-001-TV059",
+              "LAC-DOXYCYCLINE-SHORT-001-TV069",
+              "LAC-DOXYCYCLINE-SHORT-001-TV079",
+              "LAC-DOXYCYCLINE-SHORT-001-TV089"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0053",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=10"
+          ],
+          "actual": {
+            "rawMatchCount": 10,
+            "deduplicatedFindingCount": 10,
+            "primaryRuleCode": "LAC-CABERGOLINE-SUPPLY-001",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended.",
+              "Clarify the treatment goal and feeding plan; require prescriber review when continued breastfeeding is intended."
+            ],
+            "ruleEffects": [
+              "LAC-CABERGOLINE-SUPPLY-001",
+              "LAC-CABERGOLINE-SUPPLY-001-TV010",
+              "LAC-CABERGOLINE-SUPPLY-001-TV020",
+              "LAC-CABERGOLINE-SUPPLY-001-TV030",
+              "LAC-CABERGOLINE-SUPPLY-001-TV040",
+              "LAC-CABERGOLINE-SUPPLY-001-TV050",
+              "LAC-CABERGOLINE-SUPPLY-001-TV060",
+              "LAC-CABERGOLINE-SUPPLY-001-TV070",
+              "LAC-CABERGOLINE-SUPPLY-001-TV080",
+              "LAC-CABERGOLINE-SUPPLY-001-TV090"
+            ]
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0058",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=1 actual=0",
+            "expected_primary_rule_code=SS-ACR-BL-PEN-CEPH-UNKNOWN but no findings"
+          ],
+          "actual": {
+            "rawMatchCount": 0,
+            "deduplicatedFindingCount": 0,
+            "primaryRuleCode": null,
+            "severities": [],
+            "actions": [],
+            "ruleEffects": []
+          }
+        },
+        {
+          "testCaseId": "TC-TV-0066",
+          "suiteVersion": "1.0-draft",
+          "priority": "P1",
+          "passed": false,
+          "failures": [
+            "expected_raw_match_count=0 actual=13"
+          ],
+          "actual": {
+            "rawMatchCount": 13,
+            "deduplicatedFindingCount": 13,
+            "primaryRuleCode": "SS-DDX-PROPRANOLOL-ASTHMA",
+            "severities": [
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH",
+              "HIGH"
+            ],
+            "actions": [
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE",
+              "CONTRAINDICATED_DO_NOT_USE"
+            ],
+            "ruleEffects": [
+              "SS-DDX-PROPRANOLOL-ASTHMA",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV001",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV009",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV017",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV025",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV033",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV041",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV049",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV057",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV065",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV073",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV081",
+              "SS-DDX-PROPRANOLOL-ASTHMA-TV089"
+            ]
+          }
+        }
+      ],
+      "ok": false
+    }
+  }
+}

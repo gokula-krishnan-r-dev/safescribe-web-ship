@@ -1,0 +1,1576 @@
+{
+  "ranAt": "2026-08-17T12:07:11.425Z",
+  "api": "local-engine (baseline + code, no published Excel)",
+  "releaseVersion": "KR-LOCAL-BASELINE",
+  "ruleCount": 0,
+  "results": [
+    {
+      "id": "ALG-D01",
+      "suite": "Direct allergy",
+      "title": "Docosanol allergy in a cold-sore consultation",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Docosanol 10% cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Docosanol."
+        },
+        {
+          "name": "engine:Abreva→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · The selected Abreva product contains docosanol."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Valacyclovir→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "must-not:block all antivirals",
+          "ok": true,
+          "detail": "unrelated antivirals not allergy-blocked"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "docosanol→BLOCK; abreva→BLOCK; Acyclovir 5%→NOT_BLOCK; ^Valacyclovir$→NOT_BLOCK",
+      "actual": "Docosanol 10% cream=BLOCK; Abreva=BLOCK; Acyclovir 5% cream=ALLOWED; Valacyclovir=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Docosanol 10% cream — Patient has a recorded allergy to Docosanol.",
+        "allergy/CRITICAL: Abreva — The selected Abreva product contains docosanol."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage A L138–185 (direct) and Stage B/C L187 (published)",
+        "lines": "L138–185"
+      }
+    },
+    {
+      "id": "ALG-D02",
+      "suite": "Direct allergy",
+      "title": "Clotrimazole allergy across vaginal and external products",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Clotrimazole vaginal cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Clotrimazole."
+        },
+        {
+          "name": "engine:Clotrimazole external cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Clotrimazole."
+        },
+        {
+          "name": "engine:Fluconazole/clotrimazole→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Clotrimazole."
+        },
+        {
+          "name": "engine:Miconazole→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Fluconazole→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Clotrimazole vaginal→BLOCK; Clotrimazole external→BLOCK; Fluconazole\\/clotrimazole→BLOCK; ^Miconazole$→NOT_BLOCK; ^Fluconazole$→NOT_BLOCK",
+      "actual": "Clotrimazole vaginal cream=BLOCK; Clotrimazole external cream=BLOCK; Fluconazole/clotrimazole=BLOCK; Miconazole=ALLOWED; Fluconazole=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Clotrimazole vaginal cream — Patient has a recorded allergy to Clotrimazole.",
+        "allergy/HIGH: Clotrimazole external cream — Patient has a recorded allergy to Clotrimazole.",
+        "allergy/HIGH: Fluconazole/clotrimazole — Patient has a recorded allergy to Clotrimazole."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage A L138–185 (direct) and Stage B/C L187 (published)",
+        "lines": "L138–185 combo scan"
+      }
+    },
+    {
+      "id": "ALG-D03",
+      "suite": "Direct allergy",
+      "title": "Acetaminophen allergy hidden in a combination analgesic",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acetaminophen."
+        },
+        {
+          "name": "engine:Acetaminophen/ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acetaminophen."
+        },
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acetaminophen."
+        },
+        {
+          "name": "engine:Ibuprofen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Acetaminophen$→BLOCK; Acetaminophen\\/ibuprofen→BLOCK; Acetaminophen\\/caffeine\\/codeine→BLOCK; ^Ibuprofen$→NOT_BLOCK",
+      "actual": "Acetaminophen=BLOCK; Acetaminophen/ibuprofen=BLOCK; Acetaminophen/caffeine/codeine=BLOCK; Ibuprofen=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Acetaminophen — Patient has a recorded allergy to Acetaminophen.",
+        "allergy/HIGH: Acetaminophen/ibuprofen — Patient has a recorded allergy to Acetaminophen.",
+        "allergy/HIGH: Acetaminophen/caffeine/codeine — Patient has a recorded allergy to Acetaminophen."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage A L138–185 (direct) and Stage B/C L187 (published)",
+        "lines": "L138–185 combination ingredients"
+      }
+    },
+    {
+      "id": "ALG-X01",
+      "suite": "Cross-reactivity",
+      "title": "Acyclovir allergy must block valacyclovir",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acyclovir→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "engine:Acyclovir/hydrocortisone cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Acyclovir."
+        },
+        {
+          "name": "engine:Valacyclovir→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Valacyclovir is a prodrug of acyclovir. A confirmed severe acyclovir allergy blocks valacyclovir."
+        },
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Famciclovir→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Acyclovir$→BLOCK; Acyclovir 5%→BLOCK; Acyclovir\\/hydrocortisone→BLOCK; ^Valacyclovir$→BLOCK; docosanol→NOT_BLOCK; famciclovir→NOT_BLOCK",
+      "actual": "Acyclovir=BLOCK; Acyclovir 5% cream=BLOCK; Acyclovir/hydrocortisone cream=BLOCK; Valacyclovir=BLOCK; Docosanol 10% cream=ALLOWED; Famciclovir=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Acyclovir — Patient has a recorded allergy to Acyclovir.",
+        "allergy/HIGH: Acyclovir 5% cream — Patient has a recorded allergy to Acyclovir.",
+        "allergy/HIGH: Acyclovir/hydrocortisone cream — Patient has a recorded allergy to Acyclovir.",
+        "cross_reactivity/HIGH: Valacyclovir — Valacyclovir is a prodrug of acyclovir. A confirmed severe acyclovir allergy blocks valacyclovir."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage B/C L187 matchPublishedRule()",
+        "lines": "L187 matchPublishedRule"
+      }
+    },
+    {
+      "id": "ALG-X02",
+      "suite": "Cross-reactivity",
+      "title": "Valacyclovir allergy must block acyclovir oral and topical",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Valacyclovir→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Valacyclovir."
+        },
+        {
+          "name": "engine:Acyclovir→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Acyclovir is the active moiety of valacyclovir. A confirmed valacyclovir allergy blocks acyclovir products."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Acyclovir is the active moiety of valacyclovir. A confirmed valacyclovir allergy blocks acyclovir products."
+        },
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Valacyclovir$→BLOCK; ^Acyclovir$→BLOCK; Acyclovir 5%→BLOCK; docosanol→NOT_BLOCK",
+      "actual": "Valacyclovir=BLOCK; Acyclovir=BLOCK; Acyclovir 5% cream=BLOCK; Docosanol 10% cream=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Valacyclovir — Patient has a recorded allergy to Valacyclovir.",
+        "cross_reactivity/HIGH: Acyclovir — Acyclovir is the active moiety of valacyclovir. A confirmed valacyclovir allergy blocks acyclovir pr",
+        "cross_reactivity/HIGH: Acyclovir 5% cream — Acyclovir is the active moiety of valacyclovir. A confirmed valacyclovir allergy blocks acyclovir pr"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage B/C L187 matchPublishedRule()",
+        "lines": "L187 reciprocal CROSS_REACTIVITY"
+      }
+    },
+    {
+      "id": "ALG-X03",
+      "suite": "Cross-reactivity",
+      "title": "Severe penicillin allergy: class block plus cephalexin caution",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Amoxicillin→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Amoxicillin."
+        },
+        {
+          "name": "engine:Amoxicillin/clavulanate→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Amoxicillin."
+        },
+        {
+          "name": "engine:Penicillin V→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded penicillin-class allergy (Amoxicillin). Penicillin V is a class member."
+        },
+        {
+          "name": "engine:Ampicillin→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded penicillin-class allergy (Amoxicillin). Ampicillin is a class member."
+        },
+        {
+          "name": "engine:Cephalexin→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Cephalosporin cross-allergenicity caution in penicillin-sensitive patients. Do not present as a routine alternative."
+        },
+        {
+          "name": "engine:Azithromycin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Amoxicillin$→BLOCK; Amoxicillin\\/clavulanate→BLOCK; Penicillin V→BLOCK; Ampicillin→BLOCK; Cephalexin→CAUTION; Azithromycin→NOT_BLOCK",
+      "actual": "Amoxicillin=BLOCK; Amoxicillin/clavulanate=BLOCK; Penicillin V=BLOCK; Ampicillin=BLOCK; Cephalexin=CAUTION; Azithromycin=ALLOWED",
+      "findingsSample": [
+        "allergy/HIGH: Amoxicillin — Patient has a recorded allergy to Amoxicillin.",
+        "allergy/HIGH: Amoxicillin/clavulanate — Patient has a recorded allergy to Amoxicillin.",
+        "allergy/HIGH: Penicillin V — Patient has a recorded penicillin-class allergy (Amoxicillin). Penicillin V is a class member.",
+        "allergy/HIGH: Ampicillin — Patient has a recorded penicillin-class allergy (Amoxicillin). Ampicillin is a class member.",
+        "cross_reactivity/MODERATE: Cephalexin — Cephalosporin cross-allergenicity caution in penicillin-sensitive patients. Do not present as a rout"
+      ],
+      "warnings": [
+        "Weight required for pediatric amoxicillin dosing; cannot calculate a weight-based dose"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy-cross-reactivity-rules.xlsx",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage B/C L187 matchPublishedRule()",
+        "lines": "L187 class + cephalosporin caution"
+      }
+    },
+    {
+      "id": "DDI-01",
+      "suite": "Drug–drug interaction",
+      "title": "Clopidogrel with omeprazole or esomeprazole",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Omeprazole→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Omeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid suppressant such as pantoprazole or fam"
+        },
+        {
+          "name": "engine:Esomeprazole→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Esomeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid suppressant such as pantoprazole or f"
+        },
+        {
+          "name": "engine:Pantoprazole→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Famotidine→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "must-not:class-wide PPI block",
+          "ok": true,
+          "detail": "pantoprazole not class-blocked"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Omeprazole→CAUTION; Esomeprazole→CAUTION; Pantoprazole→NOT_BLOCK; Famotidine→NOT_BLOCK",
+      "actual": "Omeprazole=CAUTION; Esomeprazole=CAUTION; Pantoprazole=ALLOWED; Famotidine=ALLOWED",
+      "findingsSample": [
+        "drug_interaction/HIGH: Omeprazole — Omeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative acid",
+        "drug_interaction/HIGH: Esomeprazole — Esomeprazole may reduce the antiplatelet effect of clopidogrel via CYP2C19. Prefer an alternative ac"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-interactions.xlsx",
+        "code": "drug-interactions.xlsx · evaluator Stage E L321–406",
+        "lines": "L321–406"
+      }
+    },
+    {
+      "id": "DDI-02",
+      "suite": "Drug–drug interaction",
+      "title": "Clarithromycin with active simvastatin",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Clarithromycin→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Concomitant use with simvastatin is contraindicated because of myopathy and rhabdomyolysis risk. Do not auto-hold simvastatin in software."
+        },
+        {
+          "name": "engine:Azithromycin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Rosuvastatin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Clarithromycin→BLOCK; Azithromycin→NOT_BLOCK; Rosuvastatin→NOT_BLOCK",
+      "actual": "Clarithromycin=BLOCK; Azithromycin=ALLOWED; Rosuvastatin=ALLOWED",
+      "findingsSample": [
+        "drug_interaction/CRITICAL: Clarithromycin — Concomitant use with simvastatin is contraindicated because of myopathy and rhabdomyolysis risk. Do "
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-interactions.xlsx",
+        "code": "drug-interactions.xlsx · evaluator Stage E L321–406",
+        "lines": "L321–406 MAJOR pair"
+      }
+    },
+    {
+      "id": "DDI-03",
+      "suite": "Drug–drug interaction",
+      "title": "Historical simvastatin must not trigger an active clarithromycin DDI",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Clarithromycin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "lifecycle:discontinued current med not modeled",
+          "ok": true,
+          "detail": "no active DDI"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Clarithromycin→NOT_BLOCK",
+      "actual": "Clarithromycin=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "drug-interactions.xlsx",
+        "code": "CODE: SafetySelectedMedication has no status/endDate; evaluator L130–134 treats all current meds as active",
+        "lines": "evaluator.service.ts L130–134; dto L230–237; types L78–81"
+      }
+    },
+    {
+      "id": "DXD-01",
+      "suite": "Drug–disease",
+      "title": "Active peptic ulcer must block NSAID-containing options",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk."
+        },
+        {
+          "name": "engine:Naproxen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk."
+        },
+        {
+          "name": "engine:Diclofenac→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk."
+        },
+        {
+          "name": "engine:Acetaminophen/ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Ibuprofen$→BLOCK; Naproxen→BLOCK; Diclofenac→BLOCK; Acetaminophen\\/ibuprofen→BLOCK; ^Acetaminophen$→NOT_BLOCK",
+      "actual": "Ibuprofen=BLOCK; Naproxen=BLOCK; Diclofenac=BLOCK; Acetaminophen/ibuprofen=BLOCK; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "drug_disease/CRITICAL: Ibuprofen — Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk.",
+        "drug_disease/CRITICAL: Naproxen — Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk.",
+        "drug_disease/CRITICAL: Diclofenac — Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk.",
+        "drug_disease/CRITICAL: Acetaminophen/ibuprofen — Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk."
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-disease-rules.xlsx",
+        "code": "drug-disease-rules.xlsx · evaluator Stage E2 L408–488",
+        "lines": "L408–488"
+      }
+    },
+    {
+      "id": "DXD-02",
+      "suite": "Drug–disease",
+      "title": "Severe hypertension must block pseudoephedrine-containing products",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Pseudoephedrine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Oral pseudoephedrine should not be used with severe hypertension because of pressor risk."
+        },
+        {
+          "name": "engine:Cetirizine/pseudoephedrine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Oral pseudoephedrine should not be used with severe hypertension because of pressor risk."
+        },
+        {
+          "name": "engine:Ibuprofen/pseudoephedrine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Oral pseudoephedrine should not be used with severe hypertension because of pressor risk."
+        },
+        {
+          "name": "engine:Saline nasal spray→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Pseudoephedrine$→BLOCK; Cetirizine\\/pseudoephedrine→BLOCK; Ibuprofen\\/pseudoephedrine→BLOCK; Saline→NOT_BLOCK",
+      "actual": "Pseudoephedrine=BLOCK; Cetirizine/pseudoephedrine=BLOCK; Ibuprofen/pseudoephedrine=BLOCK; Saline nasal spray=ALLOWED",
+      "findingsSample": [
+        "drug_disease/CRITICAL: Pseudoephedrine — Oral pseudoephedrine should not be used with severe hypertension because of pressor risk.",
+        "drug_disease/CRITICAL: Cetirizine/pseudoephedrine — Oral pseudoephedrine should not be used with severe hypertension because of pressor risk.",
+        "drug_disease/CRITICAL: Ibuprofen/pseudoephedrine — Oral pseudoephedrine should not be used with severe hypertension because of pressor risk."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-disease-rules.xlsx",
+        "code": "drug-disease-rules.xlsx · evaluator Stage E2 L408–488",
+        "lines": "L408–488 conditionMatches()"
+      }
+    },
+    {
+      "id": "DXD-03",
+      "suite": "Drug–disease",
+      "title": "ASA/NSAID-exacerbated respiratory disease",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with ASA reaction)."
+        },
+        {
+          "name": "engine:Naproxen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with ASA reaction)."
+        },
+        {
+          "name": "engine:Diclofenac→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with ASA reaction)."
+        },
+        {
+          "name": "engine:Acetaminophen/ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with ASA reaction)."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Ibuprofen$→BLOCK; Naproxen→BLOCK; Diclofenac→BLOCK; Acetaminophen\\/ibuprofen→BLOCK; ^Acetaminophen$→NOT_BLOCK",
+      "actual": "Ibuprofen=BLOCK; Naproxen=BLOCK; Diclofenac=BLOCK; Acetaminophen/ibuprofen=BLOCK; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "drug_disease/CRITICAL: Ibuprofen — NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with AS",
+        "drug_disease/CRITICAL: Naproxen — NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with AS",
+        "drug_disease/CRITICAL: Diclofenac — NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with AS",
+        "drug_disease/CRITICAL: Acetaminophen/ibuprofen — NSAIDs are contraindicated in aspirin-exacerbated respiratory disease (asthma / nasal polyps with AS"
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-disease-rules.xlsx",
+        "code": "drug-disease-rules.xlsx · evaluator Stage E2 L408–488",
+        "lines": "L408–488 AERD phenotype"
+      }
+    },
+    {
+      "id": "REN-01",
+      "suite": "Renal",
+      "title": "eGFR 10: metformin alert and renal review for systemic antivirals",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Metformin 1000 mg→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Metformin is contraindicated below eGFR 30 mL/min/1.73 m2 because of lactic acidosis risk. Prompt clinical/prescriber review; do not auto-di"
+        },
+        {
+          "name": "engine:Valacyclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regimen or obtain verified CrCl before final"
+        },
+        {
+          "name": "engine:Acyclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        },
+        {
+          "name": "engine:Famciclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Systemic famciclovir requires drug-specific renal dosing at this clearance. Verify the monograph band before prescribing."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "must-not:topical renal alert",
+          "ok": true,
+          "detail": "topical excluded"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Metformin→BLOCK; ^Valacyclovir$→CAUTION; ^Acyclovir$→CAUTION; Famciclovir→CAUTION; Acyclovir 5%→NOT_BLOCK",
+      "actual": "Valacyclovir=CAUTION; Acyclovir=CAUTION; Famciclovir=CAUTION; Acyclovir 5% cream=MORE_INFO; Metformin 1000 mg=BLOCK",
+      "findingsSample": [
+        "renal_lab/CRITICAL: Metformin 1000 mg — Metformin is contraindicated below eGFR 30 mL/min/1.73 m2 because of lactic acidosis risk. Prompt cl",
+        "renal_band/MODERATE: Acyclovir — The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and",
+        "renal_band/MODERATE: Valacyclovir — Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regi",
+        "renal_band/MODERATE: Famciclovir — Systemic famciclovir requires drug-specific renal dosing at this clearance. Verify the monograph ban"
+      ],
+      "warnings": [
+        "Verified CrCl or weight is required for renal dosing of Valacyclovir; eGFR 10 must not be used as CrCl",
+        "Renal function (eGFR) should be confirmed for renal-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "renal-rules.xlsx + lab-threshold-rules.xlsx",
+        "code": "renal-rules.xlsx · evaluator Stage H L628–677 extractEgfrValue()",
+        "lines": "L628–677 and Stage D L230"
+      }
+    },
+    {
+      "id": "REN-02",
+      "suite": "Renal",
+      "title": "Verified CrCl 25 selects a renal-adjusted valacyclovir regimen",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Valacyclovir 2 g→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regimen or obtain verified CrCl before final"
+        },
+        {
+          "name": "engine:Valacyclovir 500 mg→ALLOWED",
+          "ok": true,
+          "detail": "CAUTION · Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regimen or obtain verified CrCl before final"
+        },
+        {
+          "name": "engine:Acyclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Valacyclovir 2 g→CAUTION; Valacyclovir 500 mg→NOT_BLOCK; ^Acyclovir$→CAUTION; Acyclovir 5%→NOT_BLOCK",
+      "actual": "Valacyclovir 2 g=CAUTION; Valacyclovir 500 mg=CAUTION; Acyclovir=CAUTION; Acyclovir 5% cream=ALLOWED",
+      "findingsSample": [
+        "renal_band/MODERATE: Acyclovir — The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and",
+        "renal_band/MODERATE: Valacyclovir 2 g — Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regi"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "renal-rules.xlsx",
+        "code": "Engine uses eGFR bands, not Cockcroft-Gault CrCl regimen cards. See extractEgfrValue() L632.",
+        "lines": "evaluator.service.ts L628–677"
+      }
+    },
+    {
+      "id": "REN-03",
+      "suite": "Renal",
+      "title": "CrCl-required rule with missing weight and discordant eGFR",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Valacyclovir→MORE_INFO",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true,
+          "detail": "MORE_INFO"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Valacyclovir$→MORE_INFO; Acyclovir 5%→NOT_BLOCK",
+      "actual": "Valacyclovir=MORE_INFO; Acyclovir 5% cream=MORE_INFO",
+      "findingsSample": [],
+      "warnings": [
+        "Verified CrCl or weight is required for renal dosing of Valacyclovir; eGFR 48 must not be used as CrCl"
+      ],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "renal-rules.xlsx",
+        "code": "eGFR 48 is used as the renal measure; engine does not refuse to equate eGFR with CrCl. L632 extractEgfrValue, L647 missing eGFR only.",
+        "lines": "evaluator.service.ts L632–653"
+      }
+    },
+    {
+      "id": "HEP-01",
+      "suite": "Hepatic",
+      "title": "Active chronic liver disease blocks oral terbinafine but not topical",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Terbinafine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Oral terbinafine is contraindicated in chronic or active hepatic disease. Topical terbinafine is outside this systemic rule."
+        },
+        {
+          "name": "engine:Terbinafine cream→ALLOWED",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "engine:Clotrimazole cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Terbinafine$→BLOCK; Terbinafine cream→NOT_BLOCK; Clotrimazole cream→NOT_BLOCK",
+      "actual": "Terbinafine=BLOCK; Terbinafine cream=MORE_INFO; Clotrimazole cream=ALLOWED",
+      "findingsSample": [
+        "drug_disease/CRITICAL: Terbinafine — Oral terbinafine is contraindicated in chronic or active hepatic disease. Topical terbinafine is out"
+      ],
+      "warnings": [
+        "Required lab \"ALT\" not available for Terbinafine",
+        "Some lab-gated rules could not be fully verified"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "drug-disease-rules.xlsx",
+        "code": "drug-disease-rules.xlsx (hepatic) and lab-threshold-rules.xlsx (LFTs) · Stages E2 + D",
+        "lines": "L408–488 route not filtered for hepatic"
+      }
+    },
+    {
+      "id": "HEP-02",
+      "suite": "Hepatic",
+      "title": "Missing baseline liver tests before oral terbinafine initiation",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Terbinafine→MORE_INFO",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "engine:Terbinafine cream→ALLOWED",
+          "ok": true,
+          "detail": "MORE_INFO"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Terbinafine$→MORE_INFO; Terbinafine cream→NOT_BLOCK",
+      "actual": "Terbinafine=MORE_INFO; Terbinafine cream=MORE_INFO",
+      "findingsSample": [],
+      "warnings": [
+        "Required lab \"ALT\" not available for Terbinafine"
+      ],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "lab-threshold-rules.xlsx",
+        "code": "lab-threshold-rules.xlsx · evaluator Stage D L230–318 isLabStale() L270",
+        "lines": "L260–267 missingLabAction REQUIRE_REVIEW"
+      }
+    },
+    {
+      "id": "HEP-03",
+      "suite": "Hepatic",
+      "title": "Elevated transaminases while oral terbinafine is active",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Terbinafine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Current ALT/AST are above 3× ULN. Do not continue or renew oral terbinafine without immediate clinical review."
+        },
+        {
+          "name": "engine:Terbinafine cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Ibuprofen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Terbinafine$→BLOCK; Terbinafine cream→NOT_BLOCK; Ibuprofen→NOT_BLOCK",
+      "actual": "Terbinafine=BLOCK; Terbinafine cream=ALLOWED; Ibuprofen=ALLOWED",
+      "findingsSample": [
+        "renal_lab/CRITICAL: Terbinafine — Current ALT/AST are above 3× ULN. Do not continue or renew oral terbinafine without immediate clinic",
+        "renal_lab/CRITICAL: Terbinafine 250 mg — Current ALT/AST are above 3× ULN. Do not continue or renew oral terbinafine without immediate clinic"
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "lab-threshold-rules.xlsx",
+        "code": "lab-threshold-rules.xlsx · evaluator Stage D L230–318 isLabStale() L270",
+        "lines": "L230–318 ALT/AST ABOVE_ULN"
+      }
+    },
+    {
+      "id": "LAB-01",
+      "suite": "Laboratory threshold",
+      "title": "Potassium 5.8 blocks spironolactone initiation or increase",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Spironolactone→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Serum potassium 5.8 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+        },
+        {
+          "name": "engine:Benzoyl peroxide→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Clindamycin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Spironolactone→BLOCK; Benzoyl→NOT_BLOCK; Clindamycin→NOT_BLOCK",
+      "actual": "Spironolactone=BLOCK; Benzoyl peroxide=ALLOWED; Clindamycin=ALLOWED",
+      "findingsSample": [
+        "renal_lab/HIGH: Spironolactone — Serum potassium 5.8 mmol/L is at or above 5.0. Do not start or increase spironolactone.",
+        "renal_lab/HIGH: Spironolactone 50 mg — Serum potassium 5.8 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "lab-threshold-rules.xlsx",
+        "code": "lab-threshold-rules.xlsx · evaluator Stage D L230–318 isLabStale() L270",
+        "lines": "L230–318 potassium"
+      }
+    },
+    {
+      "id": "LAB-02",
+      "suite": "Laboratory threshold",
+      "title": "Inclusive potassium boundary at 5.0 mmol/L",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Spironolactone→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Serum potassium 5 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+        },
+        {
+          "name": "engine:Benzoyl peroxide→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:K 4.9 negative boundary",
+          "ok": true,
+          "detail": "got ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Spironolactone→BLOCK; Benzoyl→NOT_BLOCK",
+      "actual": "Spironolactone=BLOCK; Benzoyl peroxide=ALLOWED",
+      "findingsSample": [
+        "renal_lab/HIGH: Spironolactone — Serum potassium 5 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "lab-threshold-rules.xlsx",
+        "code": "lab-threshold-rules.xlsx · evaluator Stage D L230–318 isLabStale() L270",
+        "lines": "compareLabValue() + resolveLabThreshold()"
+      }
+    },
+    {
+      "id": "LAB-03",
+      "suite": "Laboratory threshold",
+      "title": "A stale normal potassium result is not a current normal result",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Spironolactone→MORE_INFO",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "engine:Benzoyl peroxide→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Spironolactone→MORE_INFO; Benzoyl→NOT_BLOCK",
+      "actual": "Spironolactone=MORE_INFO; Benzoyl peroxide=ALLOWED",
+      "findingsSample": [],
+      "warnings": [
+        "Lab \"potassium\" may be stale (>90 days) for Spironolactone"
+      ],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "lab-threshold-rules.xlsx",
+        "code": "isLabStale() L270–275 warns but still evaluates the value; a stale normal can look green unless maxAgeDays is set on the rule.",
+        "lines": "evaluator.service.ts L270–301"
+      }
+    },
+    {
+      "id": "PREG-01",
+      "suite": "Pregnancy",
+      "title": "Confirmed first-trimester pregnancy blocks ACE inhibitors",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ramipril→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · ACE inhibitors are contraindicated during pregnancy."
+        },
+        {
+          "name": "engine:Lisinopril→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · ACE inhibitors are contraindicated during pregnancy."
+        },
+        {
+          "name": "engine:Enalapril→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · ACE inhibitors are contraindicated during pregnancy."
+        },
+        {
+          "name": "engine:Amlodipine→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Ramipril$→BLOCK; Lisinopril→BLOCK; Enalapril→BLOCK; Amlodipine→NOT_BLOCK",
+      "actual": "Ramipril=BLOCK; Lisinopril=BLOCK; Enalapril=BLOCK; Amlodipine=ALLOWED",
+      "findingsSample": [
+        "pregnancy/CRITICAL: Ramipril — ACE inhibitors are contraindicated during pregnancy.",
+        "pregnancy/CRITICAL: Lisinopril — ACE inhibitors are contraindicated during pregnancy.",
+        "pregnancy/CRITICAL: Enalapril — ACE inhibitors are contraindicated during pregnancy.",
+        "pregnancy/CRITICAL: Ramipril 10 mg — ACE inhibitors are contraindicated during pregnancy."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "pregnancy-rules.xlsx",
+        "code": "pregnancy-rules.xlsx · evaluator Stage F L491–567 parsePregnancyStatus()",
+        "lines": "L491–549"
+      }
+    },
+    {
+      "id": "PREG-02",
+      "suite": "Pregnancy",
+      "title": "Third-trimester pregnancy blocks ibuprofen and combinations",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arteriosus risk."
+        },
+        {
+          "name": "engine:Acetaminophen/ibuprofen→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arteriosus risk."
+        },
+        {
+          "name": "engine:Ibuprofen/pseudoephedrine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arteriosus risk."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "^Ibuprofen$→BLOCK; Acetaminophen\\/ibuprofen→BLOCK; Ibuprofen\\/pseudoephedrine→BLOCK; ^Acetaminophen$→NOT_BLOCK",
+      "actual": "Ibuprofen=BLOCK; Acetaminophen/ibuprofen=BLOCK; Ibuprofen/pseudoephedrine=BLOCK; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "pregnancy/CRITICAL: Ibuprofen — Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arterio",
+        "pregnancy/CRITICAL: Acetaminophen/ibuprofen — Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arterio",
+        "pregnancy/CRITICAL: Ibuprofen/pseudoephedrine — Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arterio"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "pregnancy-rules.xlsx",
+        "code": "pregnancy-rules.xlsx · evaluator Stage F L491–567 parsePregnancyStatus()",
+        "lines": "L491–549 trimesterMatches()"
+      }
+    },
+    {
+      "id": "PREG-03",
+      "suite": "Pregnancy",
+      "title": "Unknown pregnancy status must not be treated as No",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Fluconazole→MORE_INFO",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Clotrimazole vaginal cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Fluconazole→MORE_INFO; Clotrimazole→NOT_BLOCK",
+      "actual": "Fluconazole=ALLOWED; Clotrimazole vaginal cream=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "pregnancy-rules.xlsx",
+        "code": "parsePregnancyStatus(): empty → statusKnown=false (MORE_INFO); status \"unknown\" is treated as known + not pregnant (patient-context.util.ts L12–35).",
+        "lines": "patient-context.util.ts L12–35; evaluator L551–567"
+      }
+    },
+    {
+      "id": "LAC-01",
+      "suite": "Lactation",
+      "title": "Breastfeeding blocks codeine-containing products",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Codeine-containing products are contraindicated in nursing women because of infant opioid toxicity risk."
+        },
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Codeine-containing products are contraindicated in nursing women because of infant opioid toxicity risk."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Ibuprofen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Acetaminophen\\/caffeine\\/codeine→BLOCK; Codeine→BLOCK; ^Acetaminophen$→NOT_BLOCK; ^Ibuprofen$→NOT_BLOCK",
+      "actual": "Acetaminophen/caffeine/codeine=BLOCK; Tylenol with Codeine=BLOCK; Acetaminophen=ALLOWED; Ibuprofen=ALLOWED",
+      "findingsSample": [
+        "lactation/CRITICAL: Acetaminophen/caffeine/codeine — Codeine-containing products are contraindicated in nursing women because of infant opioid toxicity r",
+        "lactation/CRITICAL: Tylenol with Codeine — Codeine-containing products are contraindicated in nursing women because of infant opioid toxicity r"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "lactation-rules.xlsx",
+        "code": "lactation-rules.xlsx · evaluator Stage G L569–626 + patient-context.util.ts parsePregnancyStatus()",
+        "lines": "L574–609"
+      }
+    },
+    {
+      "id": "LAC-02",
+      "suite": "Lactation",
+      "title": "Unknown breastfeeding status requires resolution before codeine",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→MORE_INFO",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "codeine→MORE_INFO; ^Acetaminophen$→NOT_BLOCK",
+      "actual": "Acetaminophen/caffeine/codeine=ALLOWED; Acetaminophen=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "lactation-rules.xlsx",
+        "code": "Unknown lactation is a mappingWarning (L610–625), not a treatment-level MORE_INFO finding. parsePregnancyStatus has no dedicated breastfeeding tri-state.",
+        "lines": "evaluator L610–625; patient-context.util.ts L12–35"
+      }
+    },
+    {
+      "id": "LAC-03",
+      "suite": "Lactation",
+      "title": "Confirmed not breastfeeding: lactation rule must not fire",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen/caffeine/codeine→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "codeine→NOT_BLOCK",
+      "actual": "Acetaminophen/caffeine/codeine=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "lactation-rules.xlsx",
+        "code": "Passing \"not breastfeeding\" matches /\\bbreast/ and can FALSE-POSITIVE. Fixture uses \"not pregnant\" without the word breast.",
+        "lines": "patient-context.util.ts L20 isBreastfeeding regex"
+      }
+    },
+    {
+      "id": "AGE-01",
+      "suite": "Age and weight",
+      "title": "Eleven-year-old is below the cold-sore product threshold",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Docosanol 10% cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product."
+        },
+        {
+          "name": "engine:Valacyclovir→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product."
+        },
+        {
+          "name": "engine:Acyclovir/hydrocortisone cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product."
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "docosanol→BLOCK; Valacyclovir→BLOCK; hydrocortisone→BLOCK",
+      "actual": "Docosanol 10% cream=BLOCK; Valacyclovir=BLOCK; Acyclovir/hydrocortisone cream=BLOCK",
+      "findingsSample": [
+        "age_gate/CRITICAL: Docosanol 10% cream — Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product.",
+        "age_gate/CRITICAL: Valacyclovir — Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product.",
+        "age_gate/CRITICAL: Acyclovir/hydrocortisone cream — Patient age 11 is below the authorized minimum age of 12 years for this cold-sore product."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "pathway ageMin/ageMax",
+        "code": "pathway ageMin/ageMax (not a Safety Excel domain) · consultation recommend-treatment",
+        "lines": "No age_gate stage in evaluator.service.ts"
+      }
+    },
+    {
+      "id": "AGE-02",
+      "suite": "Age and weight",
+      "title": "Exactly 12 years meets an inclusive minimum-age gate",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Valacyclovir→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Acyclovir/hydrocortisone cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "docosanol→NOT_BLOCK; Valacyclovir→NOT_BLOCK; hydrocortisone→NOT_BLOCK",
+      "actual": "Docosanol 10% cream=ALLOWED; Valacyclovir=ALLOWED; Acyclovir/hydrocortisone cream=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "pathway ageMin/ageMax",
+        "code": "pathway ageMin/ageMax (not a Safety Excel domain) · consultation recommend-treatment",
+        "lines": "pathway ageMin inclusive"
+      }
+    },
+    {
+      "id": "AGE-03",
+      "suite": "Age and weight",
+      "title": "Pediatric AOM dosing requires weight before calculation",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Amoxicillin→MORE_INFO",
+          "ok": true,
+          "detail": "MORE_INFO"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Amoxicillin→MORE_INFO",
+      "actual": "Amoxicillin=MORE_INFO",
+      "findingsSample": [],
+      "warnings": [
+        "Weight required for pediatric amoxicillin dosing; cannot calculate a weight-based dose"
+      ],
+      "evalStatus": "VERIFICATION_INCOMPLETE",
+      "debug": {
+        "workbook": "pathway / treatment dose calculator",
+        "code": "SCOPE: Safety Engine evaluate() has no weight-based mg/kg calculator. This is consultation dosing, not Excel renal/lab.",
+        "lines": "No weight field on SafetyPatientContextDto (dto L278–319)"
+      }
+    },
+    {
+      "id": "DUP-01",
+      "suite": "Duplicate therapy",
+      "title": "Acetaminophen total daily dose across current and candidate products",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Acetaminophen 500 mg→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Acetaminophen 500 mg duplicates active acetaminophen 500 mg already on the current medication list (Acetaminophen 1000 mg)."
+        },
+        {
+          "name": "engine:Acetaminophen/dextromethorphan→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Acetaminophen/dextromethorphan duplicates active acetaminophen dextromethorphan already on the current medication list (Acetaminophen 1000 m"
+        },
+        {
+          "name": "engine:Ibuprofen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Acetaminophen 500→BLOCK; Acetaminophen\\/dextromethorphan→BLOCK; Ibuprofen→NOT_BLOCK",
+      "actual": "Acetaminophen 500 mg=BLOCK; Acetaminophen/dextromethorphan=BLOCK; Ibuprofen=ALLOWED",
+      "findingsSample": [
+        "duplicate_therapy/HIGH: Acetaminophen 500 mg — Acetaminophen 500 mg duplicates active acetaminophen 500 mg already on the current medication list (",
+        "duplicate_therapy/HIGH: Acetaminophen/dextromethorphan — Acetaminophen/dextromethorphan duplicates active acetaminophen dextromethorphan already on the curre"
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "(none — duplicate not a published rule type)",
+        "code": "No SAFETY_RULE_TYPES.DUPLICATE — not in evaluator stages A–H",
+        "lines": "SAFETY_RULE_TYPES has no DUPLICATE"
+      }
+    },
+    {
+      "id": "DUP-02",
+      "suite": "Duplicate therapy",
+      "title": "Advil and Motrin normalize to the same ibuprofen ingredient",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Motrin→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Motrin duplicates active ibuprofen already on the current medication list (Advil)."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Motrin→BLOCK; Acetaminophen→NOT_BLOCK",
+      "actual": "Motrin=BLOCK; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "duplicate_therapy/HIGH: Motrin — Motrin duplicates active ibuprofen already on the current medication list (Advil)."
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "(none — duplicate not a published rule type)",
+        "code": "No SAFETY_RULE_TYPES.DUPLICATE — not in evaluator stages A–H",
+        "lines": "SAFETY_RULE_TYPES has no DUPLICATE"
+      }
+    },
+    {
+      "id": "DUP-03",
+      "suite": "Duplicate therapy",
+      "title": "Naproxen plus ibuprofen is duplicate NSAID therapy",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Concurrent Ibuprofen and Naproxen 500 mg provide additive NSAID risk without expected synergy."
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Ibuprofen→CAUTION; Acetaminophen→NOT_BLOCK",
+      "actual": "Ibuprofen=CAUTION; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "duplicate_therapy/MODERATE: Ibuprofen — Concurrent Ibuprofen and Naproxen 500 mg provide additive NSAID risk without expected synergy."
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "(none — duplicate class not a published rule type)",
+        "code": "No SAFETY_RULE_TYPES.DUPLICATE — not in evaluator stages A–H",
+        "lines": "SAFETY_RULE_TYPES has no DUPLICATE"
+      }
+    },
+    {
+      "id": "REF-01",
+      "suite": "Red flag / referral",
+      "title": "Cold sore symptoms near the eye in an immunocompromised patient",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Valacyclovir→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Docosanol 10% cream→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Valacyclovir→NOT_BLOCK; docosanol→NOT_BLOCK",
+      "actual": "Valacyclovir=ALLOWED; Docosanol 10% cream=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "pathway redFlags",
+        "code": "pathway redFlags JSON · consultations.service.ts screen-red-flags / recommend-treatment",
+        "lines": "consultations.service.ts red-flag screen"
+      }
+    },
+    {
+      "id": "REF-02",
+      "suite": "Red flag / referral",
+      "title": "Anaphylaxis symptoms during an allergic-rhinitis consultation",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Cetirizine→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Cetirizine→NOT_BLOCK",
+      "actual": "Cetirizine=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "pathway redFlags",
+        "code": "pathway redFlags JSON · consultations.service.ts screen-red-flags / recommend-treatment",
+        "lines": "consultations.service.ts red-flag screen"
+      }
+    },
+    {
+      "id": "REF-03",
+      "suite": "Red flag / referral",
+      "title": "UTI symptoms with fever, flank pain and vomiting",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Nitrofurantoin→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Trimethoprim/sulfamethoxazole→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Nitrofurantoin→NOT_BLOCK; Trimethoprim→NOT_BLOCK",
+      "actual": "Nitrofurantoin=ALLOWED; Trimethoprim/sulfamethoxazole=ALLOWED",
+      "findingsSample": [],
+      "warnings": [],
+      "evalStatus": "COMPLETE_NO_FINDINGS",
+      "debug": {
+        "workbook": "pathway redFlags",
+        "code": "pathway redFlags JSON · consultations.service.ts screen-red-flags / recommend-treatment",
+        "lines": "consultations.service.ts red-flag screen"
+      }
+    },
+    {
+      "id": "MULTI-01",
+      "suite": "Multi-module",
+      "title": "Docosanol allergy plus eGFR 10, active metformin and old A1C",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Docosanol 10% cream→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Patient has a recorded allergy to Docosanol."
+        },
+        {
+          "name": "engine:Valacyclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regimen or obtain verified CrCl before final"
+        },
+        {
+          "name": "engine:Acyclovir→CAUTION",
+          "ok": true,
+          "detail": "CAUTION · The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and monitor neurotoxicity risk."
+        },
+        {
+          "name": "engine:Acyclovir 5% cream→ALLOWED",
+          "ok": true,
+          "detail": "MORE_INFO"
+        },
+        {
+          "name": "engine:Metformin 1000 mg→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Metformin is contraindicated below eGFR 30 mL/min/1.73 m2 because of lactic acidosis risk. Prompt clinical/prescriber review; do not auto-di"
+        },
+        {
+          "name": "multi:allergy and renal/lab both fire",
+          "ok": true,
+          "detail": "findingTypes=allergy,renal_lab,renal_band"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "docosanol→BLOCK; ^Valacyclovir$→CAUTION; ^Acyclovir$→CAUTION; Acyclovir 5%→NOT_BLOCK; Metformin→BLOCK",
+      "actual": "Docosanol 10% cream=BLOCK; Valacyclovir=CAUTION; Acyclovir=CAUTION; Acyclovir 5% cream=MORE_INFO; Metformin 1000 mg=BLOCK",
+      "findingsSample": [
+        "allergy/HIGH: Docosanol 10% cream — Patient has a recorded allergy to Docosanol.",
+        "renal_lab/CRITICAL: Metformin 1000 mg — Metformin is contraindicated below eGFR 30 mL/min/1.73 m2 because of lactic acidosis risk. Prompt cl",
+        "renal_band/MODERATE: Acyclovir — The patient's renal function is in the 10 to below 30 mL/min range. Adjust oral acyclovir dosing and",
+        "renal_band/MODERATE: Valacyclovir — Standard valacyclovir regimens are not appropriate at this renal function. Use a renal-adjusted regi"
+      ],
+      "warnings": [
+        "Verified CrCl or weight is required for renal dosing of Valacyclovir; eGFR 10 must not be used as CrCl",
+        "Renal function (eGFR) should be confirmed for renal-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "allergy + renal + lab",
+        "code": "allergy-cross-reactivity-rules.xlsx · evaluator Stage A L138–185 (direct) and Stage B/C L187 (published); renal-rules.xlsx · evaluator Stage H L628–677 extractEgfrValue()",
+        "lines": "Stages A + D + H — must not short-circuit"
+      }
+    },
+    {
+      "id": "MULTI-02",
+      "suite": "Multi-module",
+      "title": "Pregnancy, severe hypertension, active ulcer and NSAID duplication in one combination",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Ibuprofen/pseudoephedrine→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arteriosus risk."
+        },
+        {
+          "name": "engine:Saline nasal spray→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "engine:Acetaminophen→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "multi:independent reasons preserved",
+          "ok": true,
+          "detail": "combo findingTypes=pregnancy,drug_disease,duplicate_therapy"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Ibuprofen\\/pseudoephedrine→BLOCK; Saline→NOT_BLOCK; Acetaminophen→NOT_BLOCK",
+      "actual": "Ibuprofen/pseudoephedrine=BLOCK; Saline nasal spray=ALLOWED; Acetaminophen=ALLOWED",
+      "findingsSample": [
+        "pregnancy/CRITICAL: Ibuprofen/pseudoephedrine — Systemic NSAIDs are contraindicated in the third trimester because of fetal renal and ductus arterio",
+        "drug_disease/CRITICAL: Ibuprofen/pseudoephedrine — Systemic NSAIDs are contraindicated in active peptic ulcer disease because of bleeding risk.",
+        "duplicate_therapy/MODERATE: Ibuprofen/pseudoephedrine — Concurrent Ibuprofen/pseudoephedrine and Naproxen 500 mg provide additive NSAID risk without expecte"
+      ],
+      "warnings": [],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "pregnancy + drug-disease",
+        "code": "pregnancy-rules.xlsx · evaluator Stage F L491–567 parsePregnancyStatus(); drug-disease-rules.xlsx · evaluator Stage E2 L408–488",
+        "lines": "Stages E2 + F — must keep all reasons"
+      }
+    },
+    {
+      "id": "MULTI-03",
+      "suite": "Multi-module",
+      "title": "Spironolactone with eGFR 28, K 5.6, active ramipril and unknown pregnancy",
+      "ok": true,
+      "layer": "engine",
+      "checks": [
+        {
+          "name": "engine:Spironolactone→BLOCK",
+          "ok": true,
+          "detail": "BLOCK · Serum potassium 5.6 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+        },
+        {
+          "name": "engine:Benzoyl peroxide→ALLOWED",
+          "ok": true,
+          "detail": "ALLOWED"
+        },
+        {
+          "name": "multi:hyperK or renal block present",
+          "ok": true,
+          "detail": "findingTypes=renal_lab"
+        },
+        {
+          "name": "multi:pregnancy unknown still surfaced",
+          "ok": true,
+          "detail": "warning/status present"
+        }
+      ],
+      "summary": "All fixture assertions passed",
+      "expected": "Spironolactone→BLOCK; Benzoyl→NOT_BLOCK",
+      "actual": "Spironolactone=BLOCK; Benzoyl peroxide=ALLOWED",
+      "findingsSample": [
+        "renal_lab/HIGH: Spironolactone — Serum potassium 5.6 mmol/L is at or above 5.0. Do not start or increase spironolactone."
+      ],
+      "warnings": [
+        "Pregnancy status unknown — confirm before initiating pregnancy-gated medicines"
+      ],
+      "evalStatus": "COMPLETE_WITH_FINDINGS",
+      "debug": {
+        "workbook": "lab + renal + DDI + pregnancy",
+        "code": "lab-threshold-rules.xlsx · evaluator Stage D L230–318 isLabStale() L270; renal-rules.xlsx · evaluator Stage H L628–677 extractEgfrValue(); drug-interactions.xlsx · evaluator Stage E L321–406; pregnancy-rules.xlsx · evaluator Stage F L491–567 parsePregnancyStatus()",
+        "lines": "must not short-circuit pregnancy missing-data"
+      }
+    }
+  ]
+}

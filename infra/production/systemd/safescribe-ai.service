@@ -1,0 +1,39 @@
+[Unit]
+Description=SafeScribe AI Engine (FastAPI)
+After=network.target docker.service
+Wants=docker.service
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=safescribe
+Group=safescribe
+WorkingDirectory=/opt/safescribe/apps/ai-engine
+EnvironmentFile=/etc/safescribe/ai.env
+ExecStart=/opt/safescribe/apps/ai-engine/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/safescribe/apps/ai-engine /var/log/safescribe
+# Ensure OpenSSL / httpx can always find the system CA bundle
+Environment=SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+Environment=REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+Environment=CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+CapabilityBoundingSet=
+AmbientCapabilities=
+LockPersonality=true
+MemoryMax=512M
+CPUQuota=80%
+
+StandardOutput=append:/var/log/safescribe/ai-out.log
+StandardError=append:/var/log/safescribe/ai-error.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+# Keep Vercel uploads small and free of Flutter/iOS symlink junk.
+apps/safescribe-mic
+apps/ai-engine
+**/node_modules
+**/.next
+**/dist
+**/.venv
+**/__pycache__
+**/.packages
+**/ephemeral
+*.docx
+*.xlsx
+infra/staging/secrets
+infra/production/secrets
+apps/api/uploads
+.git

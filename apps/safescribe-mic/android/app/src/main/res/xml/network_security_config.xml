@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Production builds talk HTTPS only to SafeScribe APIs. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <!-- Allow LAN cleartext only for local Flutter debug builds. -->
+    <debug-overrides>
+        <base-config cleartextTrafficPermitted="true" />
+    </debug-overrides>
+</network-security-config>

@@ -1,0 +1,56 @@
+---
+description: Next.js frontend conventions for SafeScribe
+globs: apps/web/**/*
+alwaysApply: false
+---
+
+# SafeScribe Frontend (Next.js)
+
+## Stack
+
+Next.js App Router, TypeScript, Tailwind, Shadcn/UI, TanStack Query, React Hook Form + Zod, Zustand (auth/ui state only).
+
+## Folder Structure
+
+```
+apps/web/src/
+├── app/
+│   ├── (auth)/           # login, forgot-password, reset-password
+│   ├── (dashboard)/      # role-based layouts
+│   │   ├── super-admin/
+│   │   ├── admin/
+│   │   └── pharmacist/
+│   └── api/              # BFF routes if needed (token refresh)
+├── components/ui/        # Shadcn primitives
+├── components/shared/    # DataTable, PageHeader, ConfirmDialog, EmptyState
+├── features/             # auth, users, audit — colocate hooks, schemas, components
+├── lib/                  # api-client, auth, utils
+└── styles/               # globals.css with CSS variables for theming
+```
+
+## UI Standards
+
+- Install Shadcn components as needed; customize via CSS variables (`--primary`, `--radius`, etc.).
+- **Dashboard layout**: Collapsible sidebar, top bar with user menu, role-aware nav items.
+- **Data tables**: Use shared `DataTable` with server-side pagination; toolbar with search + filter dropdowns + bulk actions.
+- **Forms**: React Hook Form + Zod resolver. Show field-level errors. Disable submit while loading.
+- **Feedback**: Sonner toasts for success/error. Skeleton loaders on page load. Empty states with CTA.
+- **Destructive actions**: Always use `AlertDialog` confirmation.
+
+## Auth & Protected Routes
+
+- Store tokens in httpOnly cookies (via API routes or backend Set-Cookie). Never localStorage for refresh tokens.
+- Middleware (`middleware.ts`): check session, redirect unauthenticated users to `/login`, role mismatch to `/unauthorized`.
+- TanStack Query for all server state; invalidate on mutations. Auto-refresh access token before expiry.
+- `useAuth()` hook + Zustand for current user/role/permissions.
+
+## API Client
+
+```typescript
+// lib/api-client.ts — typed fetch wrapper with auth refresh interceptor
+const api = createApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
+```
+
+## Accessibility
+
+Semantic HTML, keyboard nav, focus rings, aria labels on icon buttons, sufficient color contrast.

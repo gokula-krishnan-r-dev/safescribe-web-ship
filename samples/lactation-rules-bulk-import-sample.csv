@@ -1,0 +1,3 @@
+drug_name,lactation_risk,severity,recommendation,note,action_required
+codeine,high_risk,block,avoid,risk of infant respiratory depression,hard_stop
+tramadol,high_risk,block,avoid,CNS depression risk,hard_stop

@@ -1,0 +1,3705 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+/// Platform function for SUPER_ADMIN accounts. Tenant users leave this null.
+enum SuperAdminScope {
+  FULL
+  PHARMACY
+  CLINICAL
+}
+
+// ─── Clinical Pathway Enums ────────────────────────────────────────────────────
+
+enum PathwayStatus {
+  DRAFT
+  AI_PROCESSING
+  AI_GENERATED
+  UNPUBLISHED
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Staged clinical pathway generation pipeline (authoring workflow).
+/// Status still controls publish lifecycle; pipelineStage tracks authoring progress.
+enum PathwayPipelineStage {
+  IDLE
+  CLASSIFYING
+  DOCUMENT_REVIEW
+  EXTRACTING_CONCEPTS
+  CONCEPTS_READY
+  GENERATING
+  CLINICAL_REVIEW
+  COMPLETE
+}
+
+/// Admin/AI role for a source document during pathway authoring.
+enum DocumentRole {
+  PRIMARY
+  SUPPORTING
+  REFERENCE_ONLY
+}
+
+/// AI-classified clinical document type.
+enum ClinicalDocumentType {
+  CLINICAL_GUIDELINE
+  NATIONAL_GUIDELINE
+  PROVINCIAL_GUIDELINE
+  CLINICAL_ALGORITHM
+  ASSESSMENT_FORM
+  DRUG_MONOGRAPH
+  REVIEW_ARTICLE
+  PATIENT_HANDOUT
+  LOCAL_POLICY
+  EDUCATIONAL_MATERIAL
+  RESEARCH_ARTICLE
+  OTHER
+}
+
+/// Normalized clinical concept categories (pre-pathway generation).
+enum ClinicalConceptCategory {
+  DIAGNOSIS
+  HISTORY
+  SYMPTOM
+  RED_FLAG
+  DIFFERENTIAL
+  TREATMENT
+  ELIGIBILITY
+  COUNSELLING
+  FOLLOW_UP
+  LAB
+  PHYSICAL_EXAM
+  OTHER
+}
+
+enum QuestionType {
+  TEXT
+  TEXTAREA
+  YES_NO
+  DATE
+  NUMBER
+  SELECT
+  MULTI_SELECT
+  SCALE
+}
+
+enum QuestionStatus {
+  AI_GENERATED
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum RuleSeverity {
+  INFO
+  WARNING
+  CRITICAL
+  STOP
+}
+
+enum RuleAction {
+  URGENT_REFERRAL
+  STOP_PRESCRIBING
+  SHOW_WARNING
+  REQUIRE_DOCUMENTATION
+  ADJUST_DOSE
+  CONTRAINDICATED
+}
+
+enum ContentCreatedBy {
+  AI
+  USER
+}
+
+/// Never / Optional / Required — used for physical exam & lab requirements
+enum RequirementLevel {
+  NEVER
+  OPTIONAL
+  REQUIRED
+}
+
+/// Treatment Options taxonomy — consistent across every clinical pathway
+enum TreatmentCategory {
+  PRESCRIPTION
+  OTC
+  SUPPLEMENT
+  NON_DRUG
+}
+
+/// Pharmacist-facing recommendation priority for a treatment option
+enum RecommendationLevel {
+  FIRST_LINE
+  SECOND_LINE
+  ALTERNATIVE
+  ADJUNCTIVE
+  SUPPORTIVE_CARE
+  SPECIALIST
+}
+
+enum TreatmentLibraryVersionStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  CHANGES_REQUESTED
+  RETIRED
+}
+
+enum TreatmentLibraryMatchStatus {
+  MATCHED
+  INCOMPLETE
+  UNMATCHED
+}
+
+enum TreatmentLibraryPopulation {
+  ADULT
+  PEDIATRIC
+  WEIGHT_BASED
+  OTHER
+}
+
+enum TreatmentLibraryLinkStatus {
+  LINKED
+  DETACHED
+  MANUAL
+}
+
+enum PathwayQaRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum IpAccessMode {
+  GLOBAL
+  PER_USER
+}
+
+enum PharmacyNetworkStatus {
+  PENDING
+  APPROVED
+  DISABLED
+}
+
+enum PharmacyNetworkSource {
+  MANUAL
+  VERIFICATION_LINK
+  ALBERTA_LAUNCH
+}
+
+enum PharmacyNetworkVerificationStatus {
+  SENT
+  OPENED
+  CONFIRMED
+  APPROVED
+  EXPIRED
+  CANCELLED
+  REJECTED
+}
+
+model Tenant {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String       @unique
+  status    TenantStatus @default(ACTIVE)
+  /// Pharmacy outbound fax number shown on PCP letters and documents.
+  faxNumber String?
+  /// Optional pharmacy phone (patient handout / letter contact).
+  phone     String?
+  /// Street address shown on the Patient Care Summary Questions? section.
+  address   String?
+  /// IANA timezone used for daily/monthly usage reset (not UTC midnight).
+  timezone  String       @default("America/Edmonton")
+  /// Phix pharmacy id when this tenant was provisioned from Phix.
+  phixPharmacyId String? @unique
+  /// Licensed pharmacy number copied from Phix (display / matching only).
+  pharmacyLicenseNumber String?
+  /// True when this pharmacy is a Phix customer (same-credential login).
+  phixCustomer Boolean @default(false)
+  /// When false, pharmacists may sign in from any network. Allowed IPs are kept.
+  networkAccessEnabled Boolean @default(true)
+  /// Pharmacy logo / profile image shown on prescription PDFs.
+  logoStorageKey      String?
+  logoStorageProvider String?
+  logoMimeType        String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  users            User[]
+  auditLogs        AuditLog[]
+  clinicalPathways ClinicalPathway[]
+  consultations    Consultation[]
+  faxLogs          FaxLog[]
+  faxContacts      PharmacyFaxContact[]
+  ipAccess         TenantIpAccess?
+  ipAllowlist      IpAllowlistEntry[]
+  pharmacyNetworks PharmacyNetwork[]
+  networkVerifications PharmacyNetworkVerification[]
+  entitlements     SafeScribeEntitlement[]
+  usageEvents      SafeScribeUsageEvent[]
+  treatmentQuickAddUsages TreatmentQuickAddUsage[]
+  treatmentLibraryItems TreatmentLibraryItem[]
+  accessRequests   SafescribeAccessRequest[]
+  matchedAccessRequests SafescribeAccessRequest[] @relation("AccessRequestMatchedPharmacy")
+
+  @@index([status])
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  displayName String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users           User[]
+  rolePermissions RolePermission[]
+
+  @@index([name])
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  module      String
+  action      String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@index([module])
+}
+
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model User {
+  id                  String     @id @default(cuid())
+  tenantId            String?
+  email               String
+  passwordHash        String
+  firstName           String
+  lastName            String
+  status              UserStatus @default(PENDING)
+  roleId              String
+  /// FULL = pharmacy + clinical; PHARMACY / CLINICAL are mutually exclusive. Null for tenant users.
+  superAdminScope     SuperAdminScope?
+  emailVerifiedAt     DateTime?
+  failedLoginAttempts Int        @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  deletedAt           DateTime?
+  /// Phix user id when this account was provisioned from Phix (per tenant).
+  phixUserId          String?
+  /// Pharmacist signature image stamped on Step 6 documents.
+  signatureStorageKey      String?
+  signatureStorageProvider String?
+  signatureMimeType        String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  tenant          Tenant?           @relation(fields: [tenantId], references: [id])
+  role            Role              @relation(fields: [roleId], references: [id])
+  sessions        Session[]
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+  loginHistory    LoginHistory[]
+  passwordResets  PasswordReset[]
+  loginEmailChallenges LoginEmailChallenge[]
+  createdPathways ClinicalPathway[] @relation("PathwayCreatedBy")
+  routingMetadataUpdates ClinicalPathway[] @relation("PathwayRoutingUpdatedBy")
+  handledContactInquiries ContactInquiry[] @relation("ContactInquiryHandledBy")
+  consultations   Consultation[]    @relation("ConsultationPharmacist")
+  faxLogs         FaxLog[]
+  allergyRuleUploads AllergyRuleDataset[] @relation("AllergyRuleUploadedBy")
+  safetyRulesOwned       SafetyKnowledgeRule[] @relation("SafetyRuleOwner")
+  safetyRulesApproved    SafetyRuleVersion[]   @relation("SafetyRuleApprover")
+  safetyReleasesPublished SafetyKnowledgeRelease[] @relation("SafetyReleasePublisher")
+  safetyEvaluationOverrides SafetyEvaluationOverride[]
+  clinicalImportsUploaded ClinicalImportBatch[] @relation("ClinicalImportUploader")
+  clinicalImportsImported ClinicalImportBatch[] @relation("ClinicalImportImporter")
+  renewConfigReleasesPublished RenewConfigRelease[] @relation("RenewConfigPublisher")
+  terminologyReleasesCreated TerminologyRelease[] @relation("TerminologyReleaseCreator")
+  ipAllowlist        IpAllowlistEntry[]
+  aiPromptUpdates    AiSystemPrompt[]     @relation("AiPromptUpdatedBy")
+  aiSettingsUpdates  AiPlatformSettings[] @relation("AiSettingsUpdatedBy")
+  docFormatUpdates   DocumentFormatTemplate[] @relation("DocFormatUpdatedBy")
+  usageEvents        SafeScribeUsageEvent[]   @relation("UsageActor")
+  professionalUseAcknowledgements ProfessionalUseAcknowledgement[]
+  treatmentQuickAddUsages TreatmentQuickAddUsage[]
+  pathwayQaWorkbooks      PathwayQaWorkbook[]      @relation("PathwayQaWorkbookUploader")
+  pathwayQaRuns           PathwayQaRun[]           @relation("PathwayQaRunCreator")
+  reviewedAccessRequests  SafescribeAccessRequest[] @relation("AccessRequestReviewedBy")
+
+  @@unique([tenantId, email])
+  @@unique([tenantId, phixUserId])
+  @@index([tenantId, status])
+  @@index([email])
+  @@index([roleId])
+  @@index([phixUserId])
+  @@index([superAdminScope])
+}
+
+model Session {
+  id         String    @id @default(cuid())
+  userId     String
+  token      String    @unique
+  ipAddress  String?
+  userAgent  String?
+  deviceInfo String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+/// Email magic-link second factor after password login (Pharmacist Admin / Pharmacist).
+model LoginEmailChallenge {
+  id         String    @id @default(cuid())
+  userId     String
+  /// SHA-256 of the one-time verification token (raw token never stored).
+  tokenHash  String    @unique
+  rememberMe Boolean   @default(false)
+  ipAddress  String?
+  userAgent  String?
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([expiresAt])
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  success   Boolean
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+/// Public marketing / support inquiries from the Contact Us page (not tenant-scoped).
+model ContactInquiry {
+  id              String    @id @default(cuid())
+  fullName        String
+  workEmail       String
+  organization    String
+  topic           String
+  message         String
+  status          String    @default("new")
+  internalNote    String?
+  handledByUserId String?
+  handledAt       DateTime?
+  ipAddress       String?
+  userAgent       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  handledBy User? @relation("ContactInquiryHandledBy", fields: [handledByUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([topic, createdAt])
+  @@index([workEmail])
+  @@index([status, createdAt])
+  @@index([handledByUserId])
+}
+
+/// Public Alberta-launch complimentary access requests. Approval is required
+/// before a pharmacy tenant, entitlement, or network allowlist is created.
+model SafescribeAccessRequest {
+  id                 String   @id @default(cuid())
+  requestNumber      Int      @unique @default(autoincrement())
+  pharmacyName       String
+  licenceNumber      String
+  province           String   @default("AB")
+  contactName        String
+  email              String
+  phone              String?
+  capturedPublicIp   String
+  submissionPublicIp String?
+  ipDiscrepancy      Boolean  @default(false)
+  status             String   @default("pending")
+  source             String   @default("alberta_qr_launch")
+  matchType          String   @default("none")
+  matchConfidence    String?
+  matchReasons       Json?
+  utmSource          String?
+  utmMedium          String?
+  utmCampaign        String?
+  userAgent          String?
+  notes              String?
+  rejectReason       String?
+  matchedPharmacyId  String?
+  pharmacyId         String?
+  submittedAt        DateTime @default(now())
+  reviewedAt         DateTime?
+  reviewedById       String?
+  approvedAt         DateTime?
+  rejectedAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  pharmacy        Tenant? @relation(fields: [pharmacyId], references: [id], onDelete: SetNull)
+  matchedPharmacy Tenant? @relation("AccessRequestMatchedPharmacy", fields: [matchedPharmacyId], references: [id], onDelete: SetNull)
+  reviewedBy      User?   @relation("AccessRequestReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, submittedAt])
+  @@index([matchType, status])
+  @@index([email])
+  @@index([licenceNumber])
+  @@index([capturedPublicIp])
+  @@index([pharmacyId])
+  @@index([matchedPharmacyId])
+  @@index([reviewedById])
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String?
+  tenantId      String?
+  action        String
+  module        String
+  ipAddress     String?
+  userAgent     String?
+  deviceInfo    String?
+  previousValue Json?
+  newValue      Json?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, createdAt])
+  @@index([userId, createdAt])
+  @@index([action])
+  @@index([module])
+}
+
+/// Append-only pharmacist professional-use acknowledgement audit (one row per login acknowledgement).
+/// Access gating is session-scoped in Redis, not this table.
+model ProfessionalUseAcknowledgement {
+  id                     String   @id @default(cuid())
+  userId                 String
+  acknowledgementVersion String
+  acknowledgedAt         DateTime @default(now())
+  source                 String   @default("post_login_gate")
+  copySha256             String
+  createdAt              DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, acknowledgedAt(sort: Desc)])
+}
+
+model TenantIpAccess {
+  id        String       @id @default(cuid())
+  tenantId  String       @unique
+  enabled   Boolean      @default(false)
+  mode      IpAccessMode @default(GLOBAL)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model IpAllowlistEntry {
+  id        String    @id @default(cuid())
+  tenantId  String
+  userId    String?
+  cidr      String
+  label     String?
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, userId])
+}
+
+model PharmacyNetwork {
+  id             String                @id @default(cuid())
+  tenantId       String
+  ipAddress      String
+  cidr           String
+  label          String?
+  status         PharmacyNetworkStatus @default(APPROVED)
+  source         PharmacyNetworkSource @default(MANUAL)
+  createdById    String?
+  approvedById   String?
+  verificationId String?               @unique
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  approvedAt     DateTime?
+  lastSeenAt     DateTime?
+  lastVerifiedAt DateTime?
+
+  tenant       Tenant                         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  verification PharmacyNetworkVerification?   @relation(fields: [verificationId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status])
+  @@index([tenantId])
+}
+
+model PharmacyNetworkVerification {
+  id           String                              @id @default(cuid())
+  tenantId     String
+  email        String
+  tokenHash    String                              @unique
+  status       PharmacyNetworkVerificationStatus   @default(SENT)
+  detectedIp   String?
+  expiresAt    DateTime
+  createdById  String
+  createdAt    DateTime                            @default(now())
+  updatedAt    DateTime                            @updatedAt
+  openedAt     DateTime?
+  confirmedAt  DateTime?
+  approvedAt   DateTime?
+  approvedById String?
+  rejectedAt   DateTime?
+
+  tenant  Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  network PharmacyNetwork?
+
+  @@index([tenantId, status])
+  @@index([expiresAt])
+}
+
+/// Generic per-pharmacy module allowance (Prescribe today; Renew/Adapt/CACP later).
+model SafeScribeEntitlement {
+  id                String    @id @default(cuid())
+  tenantId          String
+  module            String
+  /// Null = unlimited. Complimentary PhIX Prescribe is 10.
+  includedQuantity  Int?
+  period            String    @default("daily")
+  active            Boolean   @default(true)
+  startsAt          DateTime?
+  endsAt            DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, module])
+  @@index([tenantId, active])
+}
+
+/// Counted clinical assessments. One counted row per consultation (idempotent).
+model SafeScribeUsageEvent {
+  id              String    @id @default(cuid())
+  tenantId        String
+  userId          String
+  module          String
+  consultationId  String?
+  eventType       String
+  counted         Boolean   @default(true)
+  occurredAt      DateTime  @default(now())
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user         User          @relation("UsageActor", fields: [userId], references: [id], onDelete: Cascade)
+  consultation Consultation? @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+
+  @@unique([consultationId, eventType])
+  @@index([tenantId, module, counted, occurredAt])
+  @@index([userId])
+}
+
+// ─── Clinical Pathway Models ───────────────────────────────────────────────────
+
+model ClinicalPathway {
+  id              String               @id @default(cuid())
+  tenantId        String?
+  name            String
+  condition       String
+  province        String
+  category        String
+  status          PathwayStatus        @default(DRAFT)
+  /// Authoring pipeline stage (independent of publish status).
+  pipelineStage   PathwayPipelineStage @default(IDLE)
+  version         Int                  @default(1)
+  description     String?
+  notes           String?
+  processingLog   Json?
+  aiSummary       String?              @db.Text
+  redFlags        Json?
+  differentials   Json?
+  /// Clinical admin signed off on generated pathway content (required before publish).
+  clinicallyReviewedAt   DateTime?
+  clinicallyReviewedById String?
+  createdById     String
+  rejectionReason String?
+  publishedAt     DateTime?
+  suspendedAt     DateTime?
+  rejectedAt      DateTime?
+  deletedAt       DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  // ── Pathway metadata (Overview module) ───────────────────────────────────
+  /// Comma-separated province codes, e.g. "ON,BC,AB". Falls back to `province` when null.
+  provinceAvailability          String?
+  ageMin                        Int?
+  ageMax                        Int?
+  pharmacistPrescribingEligible Boolean          @default(true)
+  requiresPhysicalExam          RequirementLevel @default(NEVER)
+  requiresLabResults            RequirementLevel @default(NEVER)
+  requiresFollowUp              Boolean          @default(false)
+  guidelineSource               String?
+  lastClinicalReview            DateTime?
+  /// Which Assessment sections are enabled: { diagnosisConfirmation, additionalAssessment, treatmentEligibility }
+  assessmentSectionsEnabled     Json?
+  /// Presentation Review section-level evidence IDs (central library links only).
+  presentationReview            Json?
+  /// Default documentation citation for consultations (library reference ID).
+  primaryDocumentationReferenceId String?
+  /// Optional second documentation citation for consultations.
+  secondaryDocumentationReferenceId String?
+  /// Governance summary: internal/external review status + next review due.
+  /// Shape: { internalReviewStatus, externalPeerReviewStatus, lastReviewedAt, nextReviewDueAt }
+  governance                    Json?
+
+  // ── Pathway Matching / Routing (Overview) ────────────────────────────────
+  /// Alternative names / aliases for AI pathway suggestion (not diagnosis).
+  routingAliases                String[]  @default([])
+  /// Lay / symptom-first phrases pharmacists or patients may use before a pathway is selected.
+  routingPresentingComplaints   String[]  @default([])
+  /// Anatomical, exposure, or situational context terms that improve retrieval.
+  routingContextTerms           String[]  @default([])
+  /// Semantic description of presentations for which this pathway may be relevant.
+  routingDescription            String?   @db.Text
+  routingMetadataUpdatedAt      DateTime?
+  routingMetadataUpdatedById    String?
+
+  tenant       Tenant?               @relation(fields: [tenantId], references: [id])
+  createdBy    User                  @relation("PathwayCreatedBy", fields: [createdById], references: [id])
+  routingMetadataUpdatedBy User?     @relation("PathwayRoutingUpdatedBy", fields: [routingMetadataUpdatedById], references: [id])
+  documents    ClinicalDocument[]
+  documentOverlaps ClinicalDocumentOverlap[]
+  concepts     ClinicalConcept[]
+  sections     ClinicalSection[]
+  questions    ClinicalQuestion[]
+  rules        ClinicalRule[]
+  treatments   ClinicalTreatment[]
+  counsellings ClinicalCounselling[]
+  followups    ClinicalFollowup[]
+  versions      ClinicalVersion[]
+  publications  ClinicalPublication[]
+  consultations Consultation[]
+  qaRuns        PathwayQaRun[]
+  libraryReferences PathwayEvidenceReference[]
+  evidenceMappings  PathwayEvidenceMapping[]
+  reviewers         PathwayReviewer[]
+
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@index([status])
+  @@index([pipelineStage])
+}
+
+model ClinicalDocument {
+  id               String    @id @default(cuid())
+  pathwayId        String
+  tenantId         String?
+  fileName         String
+  fileUrl          String
+  fileSize         Int
+  mimeType         String
+  extractedText    String?   @db.Text
+  pageCount        Int?
+  processingStatus String    @default("PENDING")
+  processingError  String?   @db.Text
+  uploadedAt       DateTime  @default(now())
+  processedAt      DateTime?
+
+  // ── AI classification + admin role review ────────────────────────────────
+  documentType         ClinicalDocumentType?
+  /// AI-suggested role before admin confirmation.
+  aiSuggestedRole      DocumentRole?
+  /// Confirmed role used for concept extraction (REFERENCE_ONLY skipped).
+  role                 DocumentRole?
+  roleConfirmed        Boolean               @default(false)
+  authority            String?
+  publicationYear      Int?
+  evidenceLevel        String?
+  documentFamily       String?
+  purpose              String[]              @default([])
+  classificationMeta   Json?
+  classificationConfidence Float?
+
+  pathway ClinicalPathway         @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  chunks  ClinicalDocumentChunk[]
+  overlapsAsSource ClinicalDocumentOverlap[] @relation("OverlapSource")
+  overlapsAsTarget ClinicalDocumentOverlap[] @relation("OverlapTarget")
+  conceptSources   ClinicalConceptSource[]
+
+  @@index([pathwayId])
+  @@index([tenantId])
+  @@index([pathwayId, role])
+}
+
+/// Pairwise similarity / overlap between uploaded documents for a pathway.
+model ClinicalDocumentOverlap {
+  id               String   @id @default(cuid())
+  pathwayId        String
+  sourceDocumentId String
+  targetDocumentId String
+  overlapPercent   Float
+  /// AI-recommended role for the *target* document relative to source.
+  recommendedRole  DocumentRole
+  rationale        String   @db.Text
+  createdAt        DateTime @default(now())
+
+  pathway        ClinicalPathway  @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  sourceDocument ClinicalDocument @relation("OverlapSource", fields: [sourceDocumentId], references: [id], onDelete: Cascade)
+  targetDocument ClinicalDocument @relation("OverlapTarget", fields: [targetDocumentId], references: [id], onDelete: Cascade)
+
+  @@unique([pathwayId, sourceDocumentId, targetDocumentId])
+  @@index([pathwayId])
+}
+
+/// Normalized clinical concepts extracted from documents — persisted for regeneration without re-reading PDFs.
+model ClinicalConcept {
+  id              String                  @id @default(cuid())
+  pathwayId       String
+  tenantId        String?
+  category        ClinicalConceptCategory
+  /// Canonical normalized label (post-dedup).
+  label           String
+  description     String?                 @db.Text
+  /// Structured extras: dose, severity, action, etc.
+  metadata        Json?
+  importance      String?                 /// HIGH | MEDIUM | LOW
+  confidence      Float?
+  /// Raw phrases merged into this concept.
+  aliases         String[]                @default([])
+  isAiGenerated   Boolean                 @default(true)
+  approved        Boolean                 @default(false)
+  displayOrder    Int                     @default(0)
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  pathway ClinicalPathway         @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  sources ClinicalConceptSource[]
+
+  @@index([pathwayId, category])
+  @@index([pathwayId, displayOrder])
+  @@index([tenantId])
+}
+
+model ClinicalConceptSource {
+  id              String   @id @default(cuid())
+  conceptId       String
+  documentId      String
+  sourceExcerpt   String?  @db.Text
+  sourcePage      Int?
+  createdAt       DateTime @default(now())
+
+  concept  ClinicalConcept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  document ClinicalDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([conceptId, documentId])
+  @@index([documentId])
+}
+
+model ClinicalDocumentChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  chunkIndex Int
+  content    String   @db.Text
+  pageNumber Int?
+  section    String?
+  tokenCount Int?
+  createdAt  DateTime @default(now())
+
+  document ClinicalDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, chunkIndex])
+}
+
+model ClinicalSection {
+  id            String   @id @default(cuid())
+  pathwayId     String
+  name          String
+  displayName   String
+  description   String?
+  displayOrder  Int      @default(0)
+  isAiGenerated Boolean  @default(true)
+  /// Conditional visibility, e.g. { "all": [{ "field": "demographics.sex", "operator": "eq", "value": "Male" }] }
+  visibility    Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  pathway   ClinicalPathway    @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  questions ClinicalQuestion[]
+
+  @@index([pathwayId, displayOrder])
+}
+
+model ClinicalQuestion {
+  id              String           @id @default(cuid())
+  pathwayId       String
+  sectionId       String?
+  tenantId        String?
+  question        String
+  description     String?
+  helpText        String?
+  type            QuestionType
+  required        Boolean          @default(true)
+  displayOrder    Int              @default(0)
+  options         Json?
+  validation      Json?
+  sourceDocument  String?
+  sourcePage      Int?
+  sourceReference String?
+  /// Linked IDs from PathwayEvidenceReference (References & Governance library).
+  evidenceRefIds  String[]         @default([])
+  /// Optional conditional visibility, e.g. { sourceField, operator, value, label }.
+  visibilityRule  Json?
+  confidence      Float?
+  status          QuestionStatus   @default(AI_GENERATED)
+  createdBy       ContentCreatedBy @default(AI)
+  approved        Boolean          @default(false)
+  approvedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  pathway ClinicalPathway  @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  section ClinicalSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  rules   ClinicalRule[]
+
+  @@index([pathwayId, sectionId, displayOrder])
+  @@index([pathwayId, status])
+  @@index([tenantId])
+}
+
+/// Platform-wide citation master (Super Admin). Pathways attach copies via libraryItemId.
+model EvidenceReferenceLibraryItem {
+  id                      String    @id @default(cuid())
+  citationTitle           String
+  organization            String?
+  edition                 String?
+  publicationYear         Int?
+  url                     String?
+  doi                     String?
+  documentType            String?
+  jurisdiction            String?
+  referenceType           String    @default("source")
+  /// verified | needs_review | verification_required | archived
+  status                  String    @default("needs_review")
+  verifiedBy              String?
+  verificationDate        DateTime?
+  importSource            String    @default("manual")
+  isRetired               Boolean   @default(false)
+  /// Controlled clinical-use tag codes (see CLINICAL_USE_TAG_CODES).
+  clinicalUseTags         String[]  @default([])
+  /// Suggested Prescribe sections (presentation_review, …, section_wide).
+  suggestedSections       String[]  @default([])
+  documentationCandidate  Boolean   @default(false)
+  verificationRequired    Boolean   @default(false)
+  notes                   String?   @db.VarChar(500)
+  searchText              String    @default("") @db.Text
+  stableKey               String    @unique
+  pathwayUsageCount       Int       @default(0)
+  createdById             String
+  updatedById             String
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  pathwayLinks PathwayEvidenceReference[]
+
+  @@index([isRetired, status, updatedAt])
+  @@index([documentType])
+  @@index([updatedAt])
+}
+
+/// Platform-wide reviewer master (Super Admin). Pathways attach copies via libraryReviewerId.
+model ReviewerLibraryItem {
+  id                String   @id @default(cuid())
+  /// Preferred type when linking: internal | external
+  reviewerType      String
+  name              String
+  credentials       String
+  organization      String?
+  role              String
+  isRetired         Boolean  @default(false)
+  searchText        String   @default("") @db.Text
+  stableKey         String   @unique
+  pathwayUsageCount Int      @default(0)
+  createdById       String
+  updatedById       String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  pathwayLinks PathwayReviewer[]
+
+  @@index([isRetired, reviewerType, updatedAt])
+  @@index([updatedAt])
+}
+
+/// Pathway-scoped citation library. Content modules store IDs / mappings only.
+model PathwayEvidenceReference {
+  id                     String    @id @default(cuid())
+  pathwayId              String
+  tenantId               String?
+  libraryItemId          String?
+  citationTitle          String
+  organization           String?
+  edition                String?
+  publicationYear        Int?
+  url                    String?
+  doi                    String?
+  documentType           String?
+  jurisdiction           String?
+  referenceType          String    @default("source")
+  /// verified | needs_review | verification_required | archived
+  status                 String    @default("needs_review")
+  verifiedBy             String?
+  verificationDate       DateTime?
+  /// manual | chatgpt | excel | migration | library
+  importSource           String    @default("manual")
+  clinicalUseTags        String[]  @default([])
+  documentationCandidate Boolean   @default(false)
+  verificationRequired   Boolean   @default(false)
+  notes                  String?   @db.VarChar(500)
+  createdById            String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  pathway     ClinicalPathway                @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  libraryItem EvidenceReferenceLibraryItem?  @relation(fields: [libraryItemId], references: [id], onDelete: SetNull)
+  mappings    PathwayEvidenceMapping[]
+
+  @@index([pathwayId, createdAt])
+  @@index([pathwayId, status])
+  @@index([tenantId])
+  @@index([libraryItemId])
+}
+
+/// Central evidence link from a library reference to pathway content.
+model PathwayEvidenceMapping {
+  id          String   @id @default(cuid())
+  pathwayId   String
+  referenceId String
+  /// presentation_review | differential_review | red_flags | treatment_options | patient_guidance
+  section     String
+  /// section | question | differential | red_flag | treatment | guidance
+  mappingType String
+  /// Empty string = section-wide / no specific target (keeps unique constraint reliable).
+  targetId    String   @default("")
+  /// ChatGPT-suggested mapping not yet confirmed by admin
+  suggested   Boolean  @default(false)
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pathway   ClinicalPathway          @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  reference PathwayEvidenceReference @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+
+  @@unique([pathwayId, referenceId, section, mappingType, targetId])
+  @@index([pathwayId, referenceId])
+  @@index([pathwayId, section])
+  @@index([referenceId])
+}
+
+/// Internal or independent external pathway reviewers (References & Governance).
+model PathwayReviewer {
+  id                String   @id @default(cuid())
+  pathwayId         String
+  libraryReviewerId String?
+  /// internal | external
+  reviewerType      String
+  name              String
+  credentials       String
+  organization      String?
+  role              String
+  reviewedAreas     String[]
+  reviewDate        DateTime
+  notes             String?  @db.Text
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  pathway         ClinicalPathway       @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  libraryReviewer ReviewerLibraryItem?  @relation(fields: [libraryReviewerId], references: [id], onDelete: SetNull)
+
+  @@index([pathwayId, reviewerType])
+  @@index([libraryReviewerId])
+}
+
+model ClinicalRule {
+  id            String       @id @default(cuid())
+  pathwayId     String
+  questionId    String?
+  tenantId      String?
+  condition     String
+  operator      String
+  value         String
+  action        RuleAction
+  severity      RuleSeverity @default(WARNING)
+  message       String
+  details       String?
+  isAiGenerated Boolean      @default(true)
+  approved      Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  pathway  ClinicalPathway   @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  question ClinicalQuestion? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+
+  @@index([pathwayId])
+  @@index([questionId])
+  @@index([tenantId])
+}
+
+model ClinicalTreatment {
+  id                   String              @id @default(cuid())
+  pathwayId            String
+  tenantId             String?
+  category             TreatmentCategory   @default(PRESCRIPTION)
+  recommendationLevel  RecommendationLevel @default(FIRST_LINE)
+  /// Display name: medication / product / supplement / non-drug recommendation
+  medicationName       String
+  genericName          String?
+  brandName            String?
+  strength             String?
+  dose                 String?
+  route                String?
+  frequency            String?
+  duration             String?
+  quantity             String?
+  directions           String?             @db.Text
+  maxDose              String?
+  eligibility          String?             @db.Text
+  clinicalIndication   String?             @db.Text
+  clinicalNotes        String?             @db.Text
+  guidelineReference   String?
+  /// Linked IDs from PathwayEvidenceReference (central library).
+  evidenceRefIds       String[]            @default([])
+  /// Optional treatment-level documentation citation override (library reference ID).
+  documentationReferenceId String?
+  evidenceStrength     String?
+  renalAdjustment      String?
+  hepaticAdjustment    String?
+  pregnancyNotes       String?
+  breastfeedingNotes   String?
+  /// Why the corresponding Yes flag applies — shown in consultation warnings
+  pregnancyReason      String?             @db.Text
+  renalAdjustmentReason String?            @db.Text
+  /// Authoritative source measure: CrCl | eGFR | OTHER | NONE
+  renalSourceBasis      String?
+  /// CrCl | eGFR | NONE — operational match; prefer eGFR for new imports
+  renalDosingBasis      String?
+  /// Structured RenalDosingRule[] used for deterministic pharmacist matching
+  renalDosingRules      Json?
+  hepaticAdjustmentReason String?          @db.Text
+  monitoringReason     String?             @db.Text
+  counsellingNotes     String?             @db.Text
+  followUpAdvice       String?             @db.Text
+  ageRestriction       String?
+  /// Comma-separated province codes, e.g. "MB,ON,BC" or "ALL"
+  provinceAvailability String?
+  warnings             String[]
+  interactions         String[]
+  monitoring           String?
+  isAiGenerated        Boolean             @default(true)
+  approved             Boolean             @default(false)
+  /// Soft-disable without deleting (province/off-formulary / temporary)
+  isActive             Boolean             @default(true)
+  archivedAt           DateTime?
+  /// Future-proof bag: formulary, authority rules, shortage substitutes, cost, etc.
+  metadata             Json?
+  displayOrder         Int                 @default(0)
+  treatmentLibraryItemId     String?
+  treatmentLibraryVersionId  String?
+  sourceVersionNumber        Int?
+  sourcePayloadHash          String?
+  sourceSnapshot             Json?
+  pathwayOverrides           Json?
+  libraryLinkStatus          TreatmentLibraryLinkStatus @default(MANUAL)
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  pathway ClinicalPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  treatmentLibraryItem    TreatmentLibraryItem?    @relation(fields: [treatmentLibraryItemId], references: [id], onDelete: SetNull)
+  treatmentLibraryVersion TreatmentLibraryVersion? @relation(fields: [treatmentLibraryVersionId], references: [id], onDelete: SetNull)
+
+  @@index([pathwayId])
+  @@index([pathwayId, category, displayOrder])
+  @@index([pathwayId, isActive])
+  @@index([tenantId])
+  @@index([treatmentLibraryItemId])
+  @@index([treatmentLibraryVersionId])
+}
+
+/// Curated reusable regimen. List/search columns are denormalized from the
+/// working version so admin queries stay indexed and do not scan JSONB.
+model TreatmentLibraryItem {
+  id                       String                       @id @default(cuid())
+  tenantId                 String?
+  stableKey                String                       @unique
+  currentApprovedVersionId String?
+  isRetired                Boolean                      @default(false)
+  displayName              String
+  genericName              String                       @default("")
+  brandName                String                       @default("")
+  strength                 String                       @default("")
+  productFormDisplay       String                       @default("")
+  routeDisplay             String                       @default("")
+  regimenLabel             String                       @default("")
+  category                 String                       @default("PRESCRIPTION")
+  population               TreatmentLibraryPopulation   @default(ADULT)
+  matchStatus              TreatmentLibraryMatchStatus  @default(UNMATCHED)
+  listStatus               TreatmentLibraryVersionStatus @default(DRAFT)
+  approvedVersionNumber    Int?
+  searchText               String                       @default("") @db.Text
+  identifierText           String                       @default("")
+  pathwayUsageCount        Int                          @default(0)
+  createdById              String
+  updatedById              String
+  createdAt                DateTime                     @default(now())
+  updatedAt                DateTime                     @updatedAt
+
+  tenant    Tenant?                  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  versions  TreatmentLibraryVersion[]
+  treatments ClinicalTreatment[]
+
+  @@index([isRetired, listStatus, updatedAt])
+  @@index([listStatus, updatedAt])
+  @@index([population])
+  @@index([category, isRetired, listStatus])
+  @@index([matchStatus])
+  @@index([productFormDisplay])
+  @@index([routeDisplay])
+  @@index([tenantId, isRetired])
+  @@index([updatedAt])
+  @@index([currentApprovedVersionId])
+}
+
+model TreatmentLibraryVersion {
+  id            String                       @id @default(cuid())
+  itemId        String
+  versionNumber Int
+  status        TreatmentLibraryVersionStatus
+  payload       Json
+  payloadHash   String
+  changeSummary String?
+  submittedById String?
+  submittedAt   DateTime?
+  reviewedById  String?
+  reviewedAt    DateTime?
+  reviewNotes   String?                      @db.Text
+  createdById   String
+  updatedById   String
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @updatedAt
+
+  item       TreatmentLibraryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  treatments ClinicalTreatment[]
+
+  @@unique([itemId, versionNumber])
+  @@index([itemId, status])
+  @@index([status])
+  @@index([payloadHash])
+}
+
+model ClinicalCounselling {
+  id             String    @id @default(cuid())
+  pathwayId      String
+  tenantId       String?
+  category       String
+  point          String
+  detail         String?   @db.Text
+  /// Patient Guidance output section: what_to_expect | self_care | follow_up
+  outputSection  String?
+  guidanceType   String?
+  /// first_line | alternative | optional
+  priority       String    @default("alternative")
+  descriptor     String?
+  archivedAt     DateTime?
+  itemVersion    Int       @default(1)
+  legacySource   String?
+  legacyId       String?
+  timing         Json?
+  /// Linked IDs from PathwayEvidenceReference (central library).
+  evidenceRefIds String[]  @default([])
+  isAiGenerated  Boolean   @default(true)
+  approved       Boolean   @default(false)
+  displayOrder   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  pathway ClinicalPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+
+  @@index([pathwayId])
+  @@index([tenantId])
+  @@index([pathwayId, outputSection, displayOrder])
+  @@index([pathwayId, archivedAt])
+  @@index([legacyId])
+}
+
+model ClinicalFollowup {
+  id            String   @id @default(cuid())
+  pathwayId     String
+  tenantId      String?
+  timeframe     String
+  condition     String
+  action        String
+  urgency       String   @default("ROUTINE")
+  isAiGenerated Boolean  @default(true)
+  approved      Boolean  @default(false)
+  displayOrder  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  pathway ClinicalPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+
+  @@index([pathwayId])
+  @@index([tenantId])
+}
+
+model ClinicalVersion {
+  id            String   @id @default(cuid())
+  pathwayId     String
+  version       Int
+  snapshot      Json
+  publishedAt   DateTime
+  publishedById String
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  pathway ClinicalPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+
+  @@unique([pathwayId, version])
+  @@index([pathwayId])
+}
+
+model ClinicalPublication {
+  id            String   @id @default(cuid())
+  pathwayId     String
+  version       Int
+  publishedAt   DateTime @default(now())
+  publishedById String
+  isActive      Boolean  @default(true)
+  notes         String?
+
+  pathway ClinicalPathway @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+
+  @@index([pathwayId, isActive])
+}
+
+// ─── Consultation Enums ────────────────────────────────────────────────────────
+
+enum ConsultationStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ConsultationStep {
+  PRESENTING_COMPLAINT
+  PATHWAY_SELECTION
+  DEMOGRAPHICS
+  CLINICAL_QUESTIONS
+  RED_FLAGS
+  ELIGIBILITY
+  TREATMENT
+  COUNSELLING
+  DOCUMENTATION
+  REVIEW
+  /// Clinical Judgment — pharmacist working diagnosis
+  CLINICAL_IMPRESSION
+  /// Clinical Judgment — prescribing readiness gate
+  PRESCRIBING_READINESS
+  /// Clinical Judgment — post-safety treatment rationale
+  TREATMENT_RATIONALE
+  /// Renew module — Step 1 medications to renew
+  RENEW_MEDICATIONS
+  /// Renew module — therapy review
+  RENEW_THERAPY_REVIEW
+  /// Renew module — clinical assessment
+  RENEW_CLINICAL_ASSESSMENT
+  /// Renew module — renewal decision
+  RENEW_DECISION
+  /// Renew module — documentation
+  RENEW_DOCUMENTATION
+  /// Renew module — summary & send
+  RENEW_SUMMARY
+  /// Adapt module — Step 1 prescription & reason
+  PRESCRIPTION_AND_REASON
+  /// Adapt module — Step 2 patient assessment (also used as Adapt progress marker)
+  PATIENT_ASSESSMENT
+  /// Adapt module — Step 3 proposed adaptation + safety
+  PROPOSED_ADAPTATION
+  /// Adapt module — Step 4 documentation & complete
+  DOCUMENTS_AND_COMPLETE
+}
+
+enum ConsultationMode {
+  GUIDED_PATHWAY
+  CLINICAL_JUDGMENT
+  DOCUMENTATION_REFERRAL
+}
+
+enum DiagnosticCertainty {
+  CONFIRMED
+  PROBABLE
+  UNCERTAIN
+}
+
+enum TreatmentSource {
+  PATHWAY_RECOMMENDED
+  PHARMACIST_SELECTED
+}
+
+enum RationaleStatus {
+  DRAFT
+  REVIEW_REQUIRED
+  CONFIRMED
+  STALE
+  SUPERSEDED
+}
+
+enum AiContentSource {
+  PHARMACIST
+  AI_DRAFT
+  AI_EDITED
+  AI_ACCEPTED
+  SYSTEM
+}
+
+enum CjWorkflowVersionStatus {
+  DRAFT
+  APPROVED
+  RETIRED
+}
+
+enum AlternativeCategory {
+  WATCHFUL_WAITING
+  OTC_MODIFICATION
+  ALTERNATIVE_PRESCRIPTION
+  NON_DRUG
+  INVESTIGATION
+  REFERRAL
+  OTHER
+}
+
+enum AiArtifactType {
+  ASSESSMENT_SUMMARY
+  REASON_FOR_PRESCRIBING
+  TREATMENT_RATIONALE
+  ALTERNATIVE_SUGGESTIONS
+  SAFETY_MITIGATION_SUMMARY
+  DOCUMENT_DRAFT
+}
+
+// ─── Consultation ──────────────────────────────────────────────────────────────
+
+model Consultation {
+  id               String             @id @default(cuid())
+  tenantId         String?
+  pharmacistId     String
+  consultationRef  String?            @unique
+  status           ConsultationStatus @default(DRAFT)
+  currentStep      ConsultationStep   @default(PRESENTING_COMPLAINT)
+  stepIndex        Int                @default(0)
+  /// prescribe | renew (and later adapt / cacp). Default keeps existing rows on Prescribe.
+  module           String             @default("prescribe")
+
+  /// GUIDED_PATHWAY | CLINICAL_JUDGMENT | DOCUMENTATION_REFERRAL (null = legacy guided)
+  consultationMode ConsultationMode?
+  /// When mode becomes DOCUMENTATION_REFERRAL, retain where the session started
+  originMode       ConsultationMode?
+  clinicalJudgmentWorkflowVersionId String?
+
+  // Step 1 — Presenting Complaint
+  transcript       String?            @db.Text
+  /// Immutable Whisper raw output (SafeScribe Mic / batch STT). Editable draft stays in transcript.
+  rawTranscript    String?            @db.Text
+  transcriptSource TranscriptSource?
+  chiefComplaint   String?
+  /// Optional clinical photos / lesion images attached at intake (max 5). JSON array of AttachmentMeta.
+  attachments      Json?
+
+  // AI extracted data (JSON for flexibility)
+  aiEntities       Json?              // extracted symptoms, meds, allergies etc
+  aiAnalysis       Json?              // full AI analysis result
+
+  // Step 2 — Pathway
+  selectedPathwayId String?
+  aiPathwaySuggestions Json?          // ranked pathway recommendations
+
+  // Step 3 — Demographics
+  demographics     Json?
+
+  // Step 4 — Clinical Questions
+  questionResponses Json?
+
+  /// Guided-pathway Diagnosis Confirmation / Treatment Eligibility clinical judgement
+  pathwayClinicalJudgement Json?
+
+  // Step 5 — Red Flags
+  redFlags         Json?
+
+  /// Structured referral outcome when Safety screening ends in referral (not treatment).
+  referralOutcome  ConsultationReferralOutcome?
+
+  // Step 6 — Eligibility
+  eligibility      Json?
+
+  // Step 7 — Treatment
+  treatmentPlan    Json?
+
+  // Step 8 — Counselling
+  counsellingNotes Json?
+
+  // Step 9 — Documentation
+  documentation    Json?
+
+  /// Renew module payload (medication list, renewal request, later steps)
+  renewPayload     Json?
+
+  // Submission
+  submittedAt      DateTime?
+  lockedAt         DateTime?
+
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  tenant           Tenant?            @relation(fields: [tenantId], references: [id])
+  pharmacist       User               @relation("ConsultationPharmacist", fields: [pharmacistId], references: [id])
+  pathway          ClinicalPathway?   @relation(fields: [selectedPathwayId], references: [id])
+  cjWorkflowVersion ClinicalJudgmentWorkflowVersion? @relation(fields: [clinicalJudgmentWorkflowVersionId], references: [id])
+  clinicalJudgmentAssessment ClinicalJudgmentAssessment?
+  treatmentRationale TreatmentRationale?
+  clinicalRedFlagChecks ClinicalRedFlagCheck[]
+  aiArtifacts      AiArtifact[]
+  auditLogs        ConsultationAuditLog[]
+  safetyEvaluations SafetyEvaluation[]
+  faxLogs          FaxLog[]
+  micPairings      MicPairing[]
+  micSessions      MicSession[]
+  micConsents      MicConsentRecord[]
+  micAudioAssets   MicAudioAsset[]
+  micTranscriptionJobs MicTranscriptionJob[]
+  usageEvents      SafeScribeUsageEvent[]
+
+  @@index([tenantId])
+  @@index([pharmacistId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([consultationMode])
+  @@index([tenantId, module, status])
+  @@index([module, status])
+}
+
+/// Completed Add-treatment picks used to rank Quick add shortcuts.
+/// Identity only — never stores dose, directions, or patient regimen data.
+model TreatmentQuickAddUsage {
+  id                    String   @id @default(cuid())
+  tenantId              String?
+  pharmacistId          String
+  consultationId        String?
+  pathwayId             String?
+  medicationId          String
+  clinicalDrugConceptId String
+  displayName           String
+  strengthLabel         String?
+  dosageFormLabel       String?
+  genericName           String?
+  terminologySource     String   @default("ccdd")
+  rxcui                 String?
+  ndc                   String?
+  createdAt             DateTime @default(now())
+
+  tenant     Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  pharmacist User    @relation(fields: [pharmacistId], references: [id], onDelete: Cascade)
+
+  @@index([pharmacistId, createdAt])
+  @@index([tenantId, pathwayId, createdAt])
+  @@index([clinicalDrugConceptId])
+  @@index([medicationId])
+}
+
+// ─── Clinical Judgment ─────────────────────────────────────────────────────────
+
+model ClinicalJudgmentWorkflowVersion {
+  id                   String                  @id @default(cuid())
+  version              String                  @unique
+  status               CjWorkflowVersionStatus @default(DRAFT)
+  effectiveAt          DateTime?
+  retiredAt            DateTime?
+  /// Universal field requirements, UI copy, feature flags, prompt refs — no condition modules
+  configuration        Json?
+  promptBundleVersion  String?
+  approvedById         String?
+  approvedAt           DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+
+  consultations        Consultation[]
+}
+
+model ClinicalJudgmentAssessment {
+  id                        String               @id @default(cuid())
+  consultationId            String               @unique
+  workingDiagnosisText      String               @db.VarChar(250)
+  workingDiagnosisCode      String?
+  workingDiagnosisSystem    String?
+  diagnosticCertainty       DiagnosticCertainty?
+  assessmentSummary         String?              @db.Text
+  assessmentSummarySource   AiContentSource?
+  assessmentSufficient      Boolean?
+  unresolvedRedFlags        Boolean?
+  readinessReason           String?              @db.Text
+  /// Prescribing Readiness v1.0 decision status
+  readinessStatus           String?
+  /// JSON string[] of READINESS_INSUFFICIENCY_REASONS
+  insufficiencyReasonCodes  Json?
+  insufficiencyDetail       String?              @db.Text
+  readinessNextAction       String?
+  readinessReturnTarget     String?
+  readinessSourceSnapshotHash String?
+  redFlagCheckId            String?
+  impressionConfirmedById   String?
+  impressionConfirmedAt     DateTime?
+  readinessConfirmedById    String?
+  readinessConfirmedAt      DateTime?
+  sourceSnapshotHash        String?
+  rowVersion                Int                  @default(1)
+  supersededAt              DateTime?
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+
+  consultation              Consultation         @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  redFlagChecks             ClinicalRedFlagCheck[]
+
+  @@index([consultationId])
+  @@index([readinessStatus])
+}
+
+/// Clinical Judgment AI Red-Flag Check (v1.0) — pharmacist-confirmed gate before readiness
+model ClinicalRedFlagCheck {
+  id                            String   @id @default(cuid())
+  tenantId                      String?
+  consultationId                String
+  clinicalJudgmentAssessmentId  String
+  patientProfileSnapshotId      String
+  status                        String   // GENERATING | REVIEW_REQUIRED | MORE_INFORMATION_REQUIRED | CONFIRMED_CLEAR | REFERRAL_REQUIRED | STALE | SUPERSEDED | GENERATION_FAILED
+  generationMode                String   // AI_GOVERNED_RETRIEVAL | MANUAL_FALLBACK
+  sourceSnapshotHash            String
+  evidenceCollectionVersion     String?
+  deterministicRuleSetVersion   String   @default("cj-rules-v1")
+  promptKey                     String?
+  promptVersion                 String?
+  model                         String?
+  modelConfiguration            Json?
+  inputManifest                 Json
+  candidateManifest             Json?
+  validationResult              Json?
+  otherUnresolvedConcern        Boolean?
+  otherConcernDetails           String?  @db.Text
+  finalDecision                 String?  // READY_FOR_PRESCRIBING_READINESS | MORE_INFORMATION_REQUIRED | DOCUMENTATION_REFERRAL
+  regenerationReason            String?
+  regenerationReasonDetail      String?
+  confirmedById                 String?
+  confirmedAt                   DateTime?
+  supersededById                String?
+  rowVersion                    Int      @default(1)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  consultation                  Consultation              @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  assessment                    ClinicalJudgmentAssessment @relation(fields: [clinicalJudgmentAssessmentId], references: [id], onDelete: Cascade)
+  questions                     ClinicalRedFlagQuestion[]
+  manualConcerns                ClinicalRedFlagManualConcern[]
+
+  @@index([consultationId, status])
+  @@index([tenantId])
+  @@index([sourceSnapshotHash])
+}
+
+model ClinicalRedFlagQuestion {
+  id                  String   @id @default(cuid())
+  redFlagCheckId      String
+  sequence            Int
+  candidateId         String
+  canonicalLabel      String
+  questionText        String   @db.Text
+  whyItMatters        String   @db.Text
+  severity            String   // CRITICAL | HIGH | MODERATE
+  referralAction      String
+  ruleId              String?
+  sourceReferences    Json
+  selectionReasonCode String
+  answer              String?  // NO | YES | UNABLE_TO_CONFIRM
+  answerNotes         String?  @db.Text
+  answeredById        String?
+  answeredAt          DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  check               ClinicalRedFlagCheck @relation(fields: [redFlagCheckId], references: [id], onDelete: Cascade)
+
+  @@unique([redFlagCheckId, sequence])
+  @@unique([redFlagCheckId, candidateId])
+  @@index([redFlagCheckId])
+}
+
+model ClinicalRedFlagManualConcern {
+  id               String   @id @default(cuid())
+  redFlagCheckId   String
+  concernText      String   @db.Text
+  whyItMatters     String?  @db.Text
+  responseStatus   String   // RESOLVED | UNRESOLVED | MORE_INFORMATION_REQUIRED
+  referralAction   String?
+  createdById      String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  check            ClinicalRedFlagCheck @relation(fields: [redFlagCheckId], references: [id], onDelete: Cascade)
+
+  @@index([redFlagCheckId])
+}
+
+model TreatmentRationale {
+  id                        String            @id @default(cuid())
+  consultationId            String            @unique
+  status                    RationaleStatus   @default(DRAFT)
+  reasonForPrescribing      String?           @db.Text
+  reasonSource              AiContentSource?
+  selectionRationale        String?           @db.Text
+  rationaleSource           AiContentSource?
+  safetyMitigationSummary   String?           @db.Text
+  safetySummarySource       AiContentSource?
+  reasonConfirmed           Boolean           @default(false)
+  selectionConfirmed        Boolean           @default(false)
+  alternativesConfirmed     Boolean           @default(false)
+  safetyConfirmed           Boolean           @default(false)
+  noAlternativesDocumented  Boolean           @default(false)
+  inputSnapshotHash         String?
+  safetyRunId               String?
+  confirmedById             String?
+  confirmedAt               DateTime?
+  rowVersion                Int               @default(1)
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+
+  consultation              Consultation     @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  alternatives              TreatmentAlternative[]
+
+  @@index([consultationId])
+  @@index([status])
+}
+
+model TreatmentAlternative {
+  id                  String              @id @default(cuid())
+  rationaleId         String
+  category            AlternativeCategory
+  selected            Boolean             @default(false)
+  details             String?             @db.Text
+  notSelectedReason   String?
+  suggestionSource    AiContentSource?
+  selectedById        String?
+  selectedAt          DateTime?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  rationale           TreatmentRationale  @relation(fields: [rationaleId], references: [id], onDelete: Cascade)
+
+  @@index([rationaleId])
+  @@unique([rationaleId, category])
+}
+
+model AiArtifact {
+  id                  String          @id @default(cuid())
+  consultationId      String
+  artifactType        AiArtifactType
+  promptKey           String?
+  promptVersion       String?
+  modelId             String?
+  inputManifest       Json?
+  inputSnapshotHash   String?
+  rawOutput           String?         @db.Text
+  validatedOutput     String?         @db.Text
+  validationStatus    String?
+  reviewStatus        String?
+  disposition         String?
+  latencyMs           Int?
+  createdById         String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  consultation        Consultation   @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([artifactType])
+}
+
+// ─── SafeScribe Mic ────────────────────────────────────────────────────────────
+
+enum TranscriptSource {
+  DESKTOP
+  SAFESCRIBE_MIC
+  MANUAL
+}
+
+enum MicPairingStatus {
+  WAITING
+  CLAIMED
+  EXPIRED
+  REVOKED
+}
+
+enum MicSessionState {
+  WAITING
+  CLAIMED
+  CONSENT_REQUIRED
+  READY
+  RECORDING
+  PAUSED
+  FINALIZING
+  TRANSCRIBING
+  TRANSCRIPT_READY
+  COMPLETED
+  RECOVERABLE_ERROR
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+enum MicConsentStatus {
+  GRANTED
+  WITHDRAWN
+}
+
+enum MicSegmentStatus {
+  OPEN
+  UPLOADING
+  COMPLETE
+  INVALID
+}
+
+enum MicAudioAssetStatus {
+  ASSEMBLING
+  NORMALIZING
+  READY
+  DELETED
+  FAILED
+}
+
+enum MicTranscriptionJobStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  RETRYABLE_ERROR
+  FAILED
+}
+
+model MicPairing {
+  id             String           @id @default(cuid())
+  tenantId       String?
+  consultationId String
+  createdById    String
+  tokenHash      String           @unique
+  status         MicPairingStatus @default(WAITING)
+  expiresAt      DateTime
+  claimedAt      DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime         @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  session      MicSession?
+
+  @@index([consultationId, createdAt(sort: Desc)])
+  @@index([status, expiresAt])
+  @@index([tenantId])
+}
+
+model MicSession {
+  id                 String          @id @default(cuid())
+  tenantId           String?
+  consultationId     String
+  pairingId          String          @unique
+  state              MicSessionState @default(WAITING)
+  stateVersion       Int             @default(0)
+  /// Ephemeral credential hash for phone (SHA-256). Never store raw token.
+  credentialHash     String?         @unique
+  credentialExpiresAt DateTime?
+  clientMimeType     String?
+  recordingStartedAt DateTime?
+  recordingEndedAt   DateTime?
+  lastHeartbeatAt    DateTime?
+  lastPartReceivedAt DateTime?
+  totalParts         Int             @default(0)
+  totalBytes         BigInt          @default(0)
+  failureCode        String?
+  currentSegmentNumber Int           @default(0)
+  /// Whisper ISO 639-1 code, or "auto" for detection
+  sourceLanguage     String          @default("auto")
+  /// When true, Whisper translates speech into English clinical notes
+  translateToEnglish Boolean         @default(false)
+  /// Language Whisper detected on the last successful transcript
+  detectedLanguage   String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  consultation Consultation         @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  pairing      MicPairing           @relation(fields: [pairingId], references: [id], onDelete: Cascade)
+  consents     MicConsentRecord[]
+  segments     MicAudioSegment[]
+  audioAssets  MicAudioAsset[]
+  transcriptionJobs MicTranscriptionJob[]
+
+  @@index([consultationId, createdAt(sort: Desc)])
+  @@index([state, lastHeartbeatAt])
+  @@index([tenantId])
+}
+
+model MicConsentRecord {
+  id             String           @id @default(cuid())
+  tenantId       String?
+  consultationId String
+  micSessionId   String
+  consentType    String           @default("AUDIO_TRANSCRIPTION")
+  status         MicConsentStatus @default(GRANTED)
+  method         String           @default("VERBAL_PHARMACIST_ATTESTATION")
+  noticeVersion  String
+  attestedById   String
+  attestedAt     DateTime         @default(now())
+  withdrawnAt    DateTime?
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  micSession    MicSession   @relation(fields: [micSessionId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([micSessionId])
+}
+
+model MicAudioSegment {
+  id            String           @id @default(cuid())
+  micSessionId   String
+  segmentNumber Int
+  startedAt     DateTime         @default(now())
+  endedAt       DateTime?
+  status        MicSegmentStatus @default(OPEN)
+
+  micSession MicSession     @relation(fields: [micSessionId], references: [id], onDelete: Cascade)
+  parts     MicAudioPart[]
+
+  @@unique([micSessionId, segmentNumber])
+  @@index([micSessionId])
+}
+
+model MicAudioPart {
+  id             String   @id @default(cuid())
+  micSessionId    String
+  segmentId      String
+  sequenceNumber Int
+  storagePath    String
+  contentType    String
+  byteSize       Int
+  checksumSha256 String?
+  receivedAt     DateTime @default(now())
+
+  segment MicAudioSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+
+  @@unique([segmentId, sequenceNumber])
+  @@index([micSessionId])
+}
+
+model MicAudioAsset {
+  id                    String              @id @default(cuid())
+  tenantId              String?
+  consultationId        String
+  micSessionId           String
+  source                String              @default("SAFESCRIBE_MIC")
+  status                MicAudioAssetStatus @default(ASSEMBLING)
+  originalContentType   String?
+  normalizedContentType String?
+  storagePath           String?
+  byteSize              Int?
+  durationSeconds       Float?
+  checksumSha256        String?
+  retentionMode         String              @default("DELETE_AFTER_SUCCESS")
+  deleteAfter           DateTime?
+  deletedAt             DateTime?
+  failureCode           String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  micSession    MicSession   @relation(fields: [micSessionId], references: [id], onDelete: Cascade)
+  transcriptionJobs MicTranscriptionJob[]
+
+  @@index([consultationId])
+  @@index([micSessionId])
+  @@index([status, deleteAfter])
+}
+
+model MicTranscriptionJob {
+  id                String                    @id @default(cuid())
+  tenantId          String?
+  consultationId    String
+  audioAssetId      String
+  micSessionId       String
+  provider          String                    @default("OPENAI")
+  model             String                    @default("whisper-1")
+  status            MicTranscriptionJobStatus @default(QUEUED)
+  attemptCount      Int                       @default(0)
+  idempotencyKey    String                    @unique
+  responseFormat    String                    @default("verbose_json")
+  languageHint      String?
+  errorCode         String?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  audioAsset   MicAudioAsset @relation(fields: [audioAssetId], references: [id], onDelete: Cascade)
+  micSession    MicSession    @relation(fields: [micSessionId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([consultationId])
+}
+
+enum FaxStatus {
+  QUEUED
+  SENDING
+  DELIVERED
+  FAILED
+  CANCELED
+}
+
+/// Outbound fax jobs via iFax (consultation documents). No cover page is sent.
+model FaxLog {
+  id               String    @id @default(cuid())
+  tenantId         String?
+  consultationId   String
+  userId           String
+  documentTypeId   String
+  documentName     String
+  recipientName    String
+  faxNumber        String
+  status           FaxStatus @default(QUEUED)
+  ifaxJobId        String?
+  errorMessage     String?
+  /// PDF byte size for audit (file itself is not retained)
+  pdfBytes         Int?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deliveredAt      DateTime?
+
+  tenant         Tenant?       @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  consultation   Consultation  @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@index([consultationId, createdAt])
+  @@index([ifaxJobId])
+  @@index([status])
+}
+
+/// Pharmacy-scoped fax directory for Send Fax autofill (docs Step 6).
+/// Multiple recipient names may share the same fax number.
+model PharmacyFaxContact {
+  id           String   @id @default(cuid())
+  tenantId     String
+  /// Display name (e.g. "Dr. Smith" or "Walk-in Clinic")
+  name         String
+  /// Normalized E.164 when possible (e.g. +14165551234)
+  faxNumber    String
+  /// Optional admin note
+  notes        String?
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, isActive, displayOrder])
+  @@index([tenantId, faxNumber])
+  @@index([tenantId, name])
+}
+
+model ConsultationAuditLog {
+  id             String       @id @default(cuid())
+  consultationId String
+  userId         String
+  action         String
+  step           String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@index([consultationId])
+  @@index([createdAt])
+}
+
+enum ReferralOutcomeRecordStatus {
+  DRAFT
+  COMPLETED
+}
+
+enum ReferralLetterRecordStatus {
+  NOT_CREATED
+  DRAFT
+  APPROVED
+  STALE
+  FINALIZED
+  VOID
+}
+
+/// Structured referral completion from Safety screening (rules-triggered).
+model ConsultationReferralOutcome {
+  id                           String                      @id @default(cuid())
+  consultationId               String                      @unique
+  pathwayId                    String
+  pathwayVersion               Int
+  urgencyCode                  String
+  urgencyDisplaySnapshot       String
+  triggerSnapshot              Json
+  destination                  String
+  destinationOtherText         String?
+  actionTaken                  String
+  patientResponse              String
+  additionalNote               String?                     @db.Text
+  reasonForReferral            String?                     @db.Text
+  providerId                   String?
+  providerFacilitySnapshot     String?
+  contactMethod                String?
+  contactMethodOtherText       String?
+  confirmationReceived         Boolean?
+  handoffAt                    DateTime?
+  status                       ReferralOutcomeRecordStatus @default(DRAFT)
+  derivedOutcomeCode           String?
+  documentationText            String?                     @db.Text
+  referralLetterDraft          String?                     @db.Text
+  /// Monotonic revision of letter-source facts (destination, action, triggers, etc.)
+  sourceRevision               Int                         @default(1)
+  sourceFingerprint            String?
+  letterStatus                 ReferralLetterRecordStatus  @default(NOT_CREATED)
+  letterApprovedAt             DateTime?
+  letterApprovedById           String?
+  letterApprovedSourceRevision Int?
+  letterClientRequestId        String?
+  /// Explicit pharmacist confirmation that referral was sent outside SafeScribe
+  letterExternalSendConfirmed  Boolean?
+  clientRequestId              String?
+  completedById                String?
+  completedAt                  DateTime?
+  createdAt                    DateTime                    @default(now())
+  updatedAt                    DateTime                    @updatedAt
+
+  consultation Consultation                       @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  letterVersions ConsultationReferralLetterVersion[]
+
+  @@index([pathwayId])
+  @@index([status])
+  @@index([letterStatus])
+  @@index([clientRequestId])
+  @@index([letterClientRequestId])
+  @@index([createdAt])
+}
+
+model ConsultationReferralLetterVersion {
+  id              String   @id @default(cuid())
+  letterOutcomeId String
+  versionNumber   Int
+  sourceRevision  Int
+  status          String
+  content         String   @db.Text
+  renderedText    String?  @db.Text
+  contentHash     String?
+  factsSnapshot   Json?
+  clientRequestId String?
+  createdById     String?
+  createdAt       DateTime @default(now())
+
+  outcome ConsultationReferralOutcome @relation(fields: [letterOutcomeId], references: [id], onDelete: Cascade)
+
+  @@unique([letterOutcomeId, versionNumber])
+  @@index([letterOutcomeId])
+  @@index([clientRequestId])
+  @@index([createdAt])
+}
+
+// ─── Medication Safety Engine ──────────────────────────────────────────────────
+
+enum SafetyRuleType {
+  ALLERGY_DIRECT
+  CROSS_REACTIVITY
+  LAB_THRESHOLD
+  DRUG_INTERACTION
+  DRUG_DISEASE
+  PREGNANCY
+  LACTATION
+  RENAL_EGFR_BAND
+}
+
+enum SafetyClinicalAction {
+  HARD_STOP
+  PHARMACIST_REVIEW
+  MONITOR
+  INFO_ONLY
+  NONE
+}
+
+enum SafetyRenalBandSeverity {
+  BLOCK
+  CAUTION
+  SAFE
+}
+
+enum SafetyLactationRisk {
+  HIGH_RISK
+  MODERATE_RISK
+  LOW_RISK
+  UNKNOWN
+}
+
+enum SafetyInteractionSeverity {
+  MAJOR
+  MODERATE
+  MINOR
+}
+
+enum SafetyPregnancyCategory {
+  CONTRAINDICATED
+  CAUTION
+  PREFERRED
+  UNKNOWN
+}
+
+enum SafetyLabComparator {
+  LT
+  LTE
+  GT
+  GTE
+  EQ
+  BETWEEN
+}
+
+enum SafetyMissingLabAction {
+  REQUIRE_REVIEW
+  SKIP_RULE
+}
+
+enum SafetyRuleStatus {
+  DRAFT
+  APPROVED
+  PUBLISHED
+  SUPERSEDED
+  RETIRED
+}
+
+enum SafetySelectorType {
+  EXACT_INGREDIENT
+  HAS_INGREDIENT
+  MEMBER_OF_CLASS
+  STRUCTURAL_RELATIONSHIP
+  VALUE_SET
+  INGREDIENT_SELECTOR
+  PRODUCT_SELECTOR
+}
+
+enum SafetyClinicalSeverity {
+  INFO
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum SafetyEvalStatus {
+  COMPLETE_NO_FINDINGS
+  COMPLETE_WITH_FINDINGS
+  VERIFICATION_INCOMPLETE
+  INPUT_INCOMPLETE
+  SERVICE_UNAVAILABLE
+}
+
+enum SafetyMatchType {
+  exact_ingredient
+  combination_product_contains_exact_ingredient
+  same_class
+  side_chain_structural
+}
+
+model SafetyKnowledgeRule {
+  id               String         @id @default(cuid())
+  code             String         @unique
+  ruleType         SafetyRuleType
+  jurisdiction     String         @default("ALL")
+  operationalState String         @default("active")
+  ownerId          String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  owner    User?               @relation("SafetyRuleOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  versions SafetyRuleVersion[]
+
+  @@index([ruleType])
+  @@index([operationalState])
+}
+
+model SafetyRuleVersion {
+  id                     String                 @id @default(cuid())
+  ruleId                 String
+  versionNumber          Int
+  /// Workbook rule_version string (e.g. 1.0-draft)
+  ruleVersionLabel       String?
+  status                 SafetyRuleStatus       @default(DRAFT)
+  changeSummary          String?
+  summary                String
+  detail                 String                 @db.Text
+  clinicalSeverity       SafetyClinicalSeverity
+  recommendedAction      String
+  overrideAllowed        Boolean                @default(true)
+  overrideReasonRequired Boolean                @default(true)
+  acknowledgementRequired Boolean               @default(false)
+  deduplicationGroup     String?
+  specificityRank        Int                    @default(0)
+  ruleEffect             String?
+  effectiveStartDate     DateTime?
+  effectiveEndDate       DateTime?
+  importBatchId          String?
+  importRowId            String?
+  matchType              SafetyMatchType?
+  relationshipType       String?
+  /// Domain-specific payload from workbook columns
+  payload                Json?
+  approvedById           String?
+  approvedAt             DateTime?
+  publishedAt            DateTime?
+  createdAt              DateTime               @default(now())
+
+  rule         SafetyKnowledgeRule   @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  approvedBy   User?                 @relation("SafetyRuleApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  participants SafetyRuleParticipant[]
+  evidence     SafetyRuleEvidence[]
+  labDetail      SafetyLabRuleDetail?
+  ddiDetail      SafetyDdiRuleDetail?
+  drugDiseaseDetail SafetyDrugDiseaseRuleDetail?
+  pregnancyDetail SafetyPregnancyRuleDetail?
+  lactationDetail SafetyLactationRuleDetail?
+  renalDetail     SafetyRenalRuleDetail?
+  releaseItems SafetyReleaseItem[]
+  importBatch  ClinicalImportBatch?  @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+  importRow    ClinicalImportRow?    @relation(fields: [importRowId], references: [id], onDelete: SetNull)
+
+  @@unique([ruleId, versionNumber])
+  @@index([status])
+  @@index([deduplicationGroup])
+}
+
+model SafetyRuleParticipant {
+  id             String             @id @default(cuid())
+  versionId      String
+  participantKey String
+  selectorType   SafetySelectorType
+  conceptText    String
+  conceptCode    String?
+  selectorVersion String?
+  terminologySystem String?
+  resolvedConceptIds String[]       @default([])
+  routeScope     String?
+  doseFormScope  String?
+  resolutionStatus String?
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([versionId])
+  @@index([conceptCode])
+}
+
+model SafetyRuleEvidence {
+  id            String    @id @default(cuid())
+  versionId     String?
+  /// Workbook evidence_link_id (unique within a release when set)
+  evidenceLinkId String?
+  ruleCode      String?
+  ruleVersion   String?
+  clinicalDomain String?
+  evidenceRole  String?
+  sourceType    String?
+  source        String
+  sourceOrganization String?
+  sourceJurisdiction String?
+  sourceIdentifier String?
+  sourceVersionOrDate String?
+  sourceUrl     String?
+  sourceLocator String?
+  section       String?
+  evidenceSummary String? @db.Text
+  applicabilityToRule String? @db.Text
+  limitationsOrUncertainty String? @db.Text
+  evidenceQuality String?
+  recommendationStrength String?
+  supportsRuleOutcome String?
+  sourceStatus  String?   @default("ACTIVE")
+  recordStatus  SafetyRuleStatus @default(DRAFT)
+  approvalStatus String?  @default("NOT_REVIEWED")
+  clinicalReviewer String?
+  clinicalReviewDate DateTime?
+  nextReviewDue DateTime?
+  effectiveFrom DateTime?
+  effectiveTo   DateTime?
+  accessDate    DateTime?
+  relevanceNote String?
+  importBatchId String?
+  extractedBy   String?
+  extractionDate DateTime?
+
+  version     SafetyRuleVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  importBatch ClinicalImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+
+  @@index([versionId])
+  @@index([evidenceLinkId])
+  @@index([ruleCode, ruleVersion])
+  @@index([importBatchId])
+}
+
+model SafetyLabRuleDetail {
+  id                 String                 @id @default(cuid())
+  versionId          String                 @unique
+  drugIngredient     String
+  observationKey     String
+  observationDisplay String?
+  loincCode          String?
+  comparator         SafetyLabComparator
+  thresholdLow       Float?
+  thresholdHigh      Float?
+  expectedUnit       String?
+  maxAgeDays         Int                    @default(365)
+  missingLabAction   SafetyMissingLabAction @default(REQUIRE_REVIEW)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([observationKey])
+  @@index([drugIngredient])
+}
+
+model SafetyDdiRuleDetail {
+  id                  String                    @id @default(cuid())
+  versionId           String                    @unique
+  drugA               String
+  drugB               String
+  drugASelectorType   String?
+  drugASelectorCode   String?
+  drugASelectorVersion String?
+  drugBSelectorType   String?
+  drugBSelectorCode   String?
+  drugBSelectorVersion String?
+  pairMatchMode       String?
+  exposureWindowCode  String?
+  interactionMechanismCode String?
+  clinicalEffectCode  String?
+  applicabilityConditionCode String?
+  monitoringCode      String?
+  monitoringDetail    String?
+  interactionSeverity SafetyInteractionSeverity
+  actionRequired      SafetyClinicalAction      @default(PHARMACIST_REVIEW)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([drugA])
+  @@index([drugB])
+  @@index([drugASelectorCode])
+  @@index([drugBSelectorCode])
+}
+
+model SafetyDrugDiseaseRuleDetail {
+  id                              String               @id @default(cuid())
+  versionId                       String               @unique
+  drugSelectorType                String
+  drugSelectorCode                String
+  drugSelectorVersion             String?
+  drugDisplayName                 String?
+  drugRouteScopeCode              String?
+  conditionCodeSystemUri          String?
+  conditionConceptCode            String?
+  conditionTerminologyVersion     String?
+  conditionDisplayName            String?
+  conditionMatchMode              String?
+  conditionClinicalStatusRequired String?
+  conditionTemporalityCode        String?
+  conditionSeverityRequirement    String?
+  conditionVerificationRequirement String?
+  applicabilityConditionCode      String?
+  clinicalRationaleCode           String?
+  monitoringCode                  String?
+  monitoringDetail                String?
+  actionRequired                  SafetyClinicalAction @default(PHARMACIST_REVIEW)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([drugSelectorCode])
+  @@index([conditionConceptCode])
+}
+
+model SafetyPregnancyRuleDetail {
+  id                String                  @id @default(cuid())
+  versionId         String                  @unique
+  drugName          String
+  pregnancyCategory SafetyPregnancyCategory
+  trimester         String                  @default("all")
+  clinicalNote      String?
+  actionRequired    SafetyClinicalAction    @default(HARD_STOP)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([drugName])
+}
+
+model SafetyLactationRuleDetail {
+  id             String               @id @default(cuid())
+  versionId      String               @unique
+  drugName       String
+  lactationRisk  SafetyLactationRisk
+  bandSeverity   SafetyRenalBandSeverity @default(BLOCK)
+  clinicalNote   String?
+  actionRequired SafetyClinicalAction @default(HARD_STOP)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([drugName])
+}
+
+model SafetyRenalRuleDetail {
+  id             String                  @id @default(cuid())
+  versionId      String                  @unique
+  drugName       String
+  egfrMin        Float
+  egfrMax        Float
+  bandSeverity   SafetyRenalBandSeverity
+  clinicalNote   String?
+  actionRequired SafetyClinicalAction    @default(PHARMACIST_REVIEW)
+
+  version SafetyRuleVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([drugName])
+  @@index([egfrMin, egfrMax])
+}
+
+model SafetyKnowledgeRelease {
+  id                    String   @id @default(cuid())
+  version               String   @unique
+  checksum              String
+  engineVersion         String   @default("safety-engine-1.0.0")
+  jurisdiction          String   @default("CA")
+  terminologyReleaseId  String?
+  releaseNotes          String?  @db.Text
+  effectiveFrom         DateTime @default(now())
+  publishedById         String
+  priorReleaseId        String?
+  publishedAt           DateTime @default(now())
+
+  publishedBy          User                    @relation("SafetyReleasePublisher", fields: [publishedById], references: [id])
+  priorRelease         SafetyKnowledgeRelease? @relation("SafetyReleaseHistory", fields: [priorReleaseId], references: [id], onDelete: SetNull)
+  nextReleases         SafetyKnowledgeRelease[] @relation("SafetyReleaseHistory")
+  items                SafetyReleaseItem[]
+  pointer              SafetyReleasePointer?
+  terminologyRelease   TerminologyRelease?     @relation(fields: [terminologyReleaseId], references: [id], onDelete: SetNull)
+  valueSets            ClinicalValueSet[]
+  testCases            ClinicalTestCase[]
+  testInputs           ClinicalTestInput[]
+  importBatches        ClinicalImportBatch[]
+
+  @@index([publishedAt])
+  @@index([terminologyReleaseId])
+}
+
+model SafetyReleaseItem {
+  id        String @id @default(cuid())
+  releaseId String
+  versionId String
+
+  release SafetyKnowledgeRelease @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  version SafetyRuleVersion      @relation(fields: [versionId], references: [id])
+
+  @@unique([releaseId, versionId])
+}
+
+model SafetyReleasePointer {
+  id        String   @id @default("singleton")
+  releaseId String   @unique
+  updatedAt DateTime @updatedAt
+
+  release SafetyKnowledgeRelease @relation(fields: [releaseId], references: [id])
+}
+
+model MedicationIngredient {
+  id          String   @id @default(cuid())
+  productName String   @unique
+  genericName String?
+  ingredients String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([genericName])
+}
+
+model DrugClassMembership {
+  id        String @id @default(cuid())
+  drugName  String
+  className String
+
+  @@unique([drugName, className])
+  @@index([className])
+  @@index([drugName])
+}
+
+/// Governed drug-class taxonomy (class hierarchy for safety matching).
+model DrugClassTaxonomy {
+  id               String   @id @default(cuid())
+  className        String   @unique
+  parentClass      String?
+  therapeuticGroup String?
+  riskTags         String[]
+  externalId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([parentClass])
+  @@index([therapeuticGroup])
+}
+
+/// Governed drug catalog — links drugs to classes, brands, and clinical notes.
+model DrugCatalog {
+  id           String   @id @default(cuid())
+  drugName     String   @unique
+  className    String
+  ingredient   String?
+  commonBrands String[]
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([className])
+  @@index([ingredient])
+}
+
+model SafetyEvaluation {
+  id                   String           @id @default(cuid())
+  consultationId       String?
+  tenantId             String?
+  status               SafetyEvalStatus
+  knowledgeRelease     String?
+  engineVersion        String?
+  terminologyReleaseId String?
+  terminologyVersion   String?
+  requestPayload       Json?
+  createdAt            DateTime         @default(now())
+
+  consultation       Consultation?             @relation(fields: [consultationId], references: [id], onDelete: SetNull)
+  findings           SafetyEvaluationFinding[]
+  override           SafetyEvaluationOverride?
+  terminologyRelease TerminologyRelease?       @relation(fields: [terminologyReleaseId], references: [id], onDelete: SetNull)
+
+  @@index([consultationId])
+  @@index([tenantId])
+  @@index([createdAt])
+  @@index([terminologyReleaseId])
+}
+
+model SafetyEvaluationFinding {
+  id                String                 @id @default(cuid())
+  evaluationId      String
+  findingType       String
+  matchType         String?
+  summary           String
+  detail            String                 @db.Text
+  clinicalSeverity  SafetyClinicalSeverity
+  recommendedAction String
+  ruleVersionId     String?
+  ruleCode          String?
+  displayed         Boolean                @default(true)
+  suppressedReason  String?
+
+  evaluation SafetyEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+}
+
+model SafetyEvaluationOverride {
+  id            String   @id @default(cuid())
+  evaluationId  String   @unique
+  reasonCode    String
+  reasonComment String?
+  userId        String
+  createdAt     DateTime @default(now())
+
+  evaluation SafetyEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  user       User             @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+// ─── Clinical Repository (12-file import, value sets, tests, terminology) ───
+
+enum ClinicalImportBatchStatus {
+  UPLOADED
+  PARSING
+  VALIDATING
+  REQUIRES_CORRECTION
+  READY_TO_IMPORT
+  IMPORTED
+  FAILED
+  CANCELLED
+}
+
+enum ClinicalImportRowStatus {
+  PENDING
+  VALID
+  WARNING
+  ERROR
+  IMPORTED
+  SKIPPED
+}
+
+enum TerminologyReleaseStatus {
+  DISCOVERED
+  DOWNLOADED
+  STAGED
+  VALIDATED
+  READY
+  ACTIVE
+  FAILED
+  RETIRED
+}
+
+enum ValueSetMembershipAction {
+  INCLUDE
+  EXCLUDE
+}
+
+model ClinicalImportBatch {
+  id                String                    @id @default(cuid())
+  fileTypeKey       String?
+  originalFilename  String
+  storagePath       String?
+  sha256            String
+  workbookSheetName String?
+  headerFingerprint String?
+  schemaVersion     String?
+  status            ClinicalImportBatchStatus @default(UPLOADED)
+  totalRows         Int                       @default(0)
+  validRows         Int                       @default(0)
+  warningRows       Int                       @default(0)
+  errorRows         Int                       @default(0)
+  targetReleaseId   String?
+  jurisdiction      String                    @default("CA")
+  terminologyReleaseId String?
+  failureSummary    String?                   @db.Text
+  uploadedAt        DateTime                  @default(now())
+  uploadedById      String
+  importedAt        DateTime?
+  importedById      String?
+
+  uploadedBy           User                     @relation("ClinicalImportUploader", fields: [uploadedById], references: [id])
+  importedBy           User?                    @relation("ClinicalImportImporter", fields: [importedById], references: [id], onDelete: SetNull)
+  targetRelease        SafetyKnowledgeRelease?  @relation(fields: [targetReleaseId], references: [id], onDelete: SetNull)
+  terminologyRelease   TerminologyRelease?      @relation(fields: [terminologyReleaseId], references: [id], onDelete: SetNull)
+  rows                 ClinicalImportRow[]
+  ruleVersions         SafetyRuleVersion[]
+  ruleEvidence         SafetyRuleEvidence[]
+  valueSets            ClinicalValueSet[]
+  valueSetMembers      ClinicalValueSetMember[]
+  testCases            ClinicalTestCase[]
+  testInputs           ClinicalTestInput[]
+  renewInputDefinitions     RenewMonitoringInput[]
+  renewMonitoringRules      RenewMonitoringRule[]
+  renewConditionalQuestions RenewConditionalQuestion[]
+  renewIndicationMaps       RenewMedicationIndicationMap[]
+
+  @@unique([sha256, targetReleaseId])
+  @@index([status])
+  @@index([fileTypeKey])
+  @@index([uploadedAt])
+}
+
+model ClinicalImportRow {
+  id                 String                  @id @default(cuid())
+  importBatchId      String
+  sourceRowNumber    Int
+  businessKey        String?
+  rawPayload         Json
+  normalizedPayload  Json?
+  rowStatus          ClinicalImportRowStatus @default(PENDING)
+  errors             Json                    @default("[]")
+  warnings           Json                    @default("[]")
+  promotedRecordType String?
+  promotedRecordId   String?
+  createdAt          DateTime                @default(now())
+
+  importBatch  ClinicalImportBatch  @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  ruleVersions SafetyRuleVersion[]
+
+  @@unique([importBatchId, sourceRowNumber])
+  @@index([rowStatus])
+  @@index([businessKey])
+}
+
+model ClinicalValueSet {
+  id                         String           @id @default(cuid())
+  releaseId                  String?
+  valueSetCode               String
+  valueSetVersion            String
+  displayName                String
+  description                String?          @db.Text
+  clinicalDomain             String
+  intendedUse                String
+  memberConceptType          String
+  terminologyBasis           String?
+  candidateGenerationMethod  String?
+  membershipMode             String
+  routeScope                 String?
+  doseFormScope              String?
+  inclusionDefinition        String           @db.Text
+  exclusionDefinition        String?          @db.Text
+  clinicalSteward            String?
+  reviewFrequencyMonths      Int?
+  terminologyReleaseSnapshot String?
+  recordStatus               SafetyRuleStatus @default(DRAFT)
+  approvalStatus             String           @default("NOT_REVIEWED")
+  effectiveFrom              DateTime?
+  effectiveTo                DateTime?
+  changeSummary              String?
+  importBatchId              String?
+  sourceRowId                String?
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+
+  release     SafetyKnowledgeRelease?  @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  importBatch ClinicalImportBatch?     @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+  members     ClinicalValueSetMember[]
+
+  @@unique([valueSetCode, valueSetVersion, releaseId])
+  @@index([valueSetCode])
+  @@index([recordStatus])
+  @@index([importBatchId])
+}
+
+model ClinicalValueSetMember {
+  id                      String                   @id @default(cuid())
+  valueSetId              String
+  memberSequence          Int
+  membershipAction        ValueSetMembershipAction
+  memberSelectorType      String
+  memberLocalCode         String?
+  memberDisplayName       String
+  conceptDomain           String
+  terminologySystem       String?
+  terminologyConceptCode  String?
+  terminologyDisplayName  String?
+  terminologyVersion      String?
+  routeScope              String?
+  doseFormScope           String?
+  candidateSource         String?
+  candidateQueryReference String?
+  mappingMethod           String?
+  mappingConfidence       String?
+  clinicalRationale       String?                  @db.Text
+  clinicalReviewStatus    String
+  reviewedBy              String?
+  reviewedAt              DateTime?
+  recordStatus            SafetyRuleStatus         @default(DRAFT)
+  effectiveFrom           DateTime?
+  effectiveTo             DateTime?
+  changeSummary           String?
+  importBatchId           String?
+  sourceRowId             String?
+  createdAt               DateTime                 @default(now())
+
+  valueSet    ClinicalValueSet     @relation(fields: [valueSetId], references: [id], onDelete: Cascade)
+  importBatch ClinicalImportBatch? @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+
+  @@unique([valueSetId, memberSequence])
+  @@index([terminologyConceptCode])
+  @@index([membershipAction])
+  @@index([importBatchId])
+}
+
+model ClinicalTestCase {
+  id                             String           @id @default(cuid())
+  releaseId                      String?
+  testCaseId                     String
+  suiteVersion                   String
+  testCaseName                   String
+  safetyDomain                   String
+  testType                       String
+  priority                       String
+  jurisdiction                   String
+  scenarioSummary                String           @db.Text
+  ruleCodeUnderTest              String?
+  ruleVersionUnderTest           String?
+  inputBundleKey                 String
+  requiredRepositoryRelease      String?
+  requiredTerminologyRelease     String?
+  expectedRawMatchCount          Int
+  expectedPrimaryRuleCode        String?
+  expectedRuleEffect             String?
+  expectedAlertSeverity          String?
+  expectedActionCode             String?
+  expectedDeduplicatedFindingCount Int
+  expectedNoMatchReason          String?
+  passCriteria                   String           @db.Text
+  executionMode                  String
+  contentStatus                  SafetyRuleStatus @default(DRAFT)
+  testOwnerRole                  String?
+  implementationNotes            String?          @db.Text
+  importBatchId                  String?
+  createdAt                      DateTime         @default(now())
+
+  release     SafetyKnowledgeRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  importBatch ClinicalImportBatch?    @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+
+  @@unique([testCaseId, suiteVersion, releaseId])
+  @@index([inputBundleKey])
+  @@index([safetyDomain])
+  @@index([priority])
+  @@index([importBatchId])
+}
+
+model ClinicalTestInput {
+  id                   String           @id @default(cuid())
+  releaseId            String?
+  recordId             String
+  inputBundleKey       String
+  inputSequence        Int
+  inputType            String
+  entityRole           String
+  payload              Json
+  terminologyRelease   String?
+  resolutionStatus     String
+  contentStatus        SafetyRuleStatus @default(DRAFT)
+  implementationNotes  String?          @db.Text
+  importBatchId        String?
+  createdAt            DateTime         @default(now())
+
+  release     SafetyKnowledgeRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  importBatch ClinicalImportBatch?    @relation(fields: [importBatchId], references: [id], onDelete: SetNull)
+
+  @@unique([recordId, releaseId])
+  @@unique([inputBundleKey, inputSequence, releaseId])
+  @@index([inputBundleKey])
+  @@index([importBatchId])
+}
+
+model TerminologyRelease {
+  id               String                   @id @default(cuid())
+  releaseKey       String                   @unique
+  status           TerminologyReleaseStatus @default(DISCOVERED)
+  ccddVersion      String
+  ccddCanonicalUrl String
+  snomedVersion    String?
+  dpdReleaseDate   DateTime?
+  sourceMetadata   Json                     @default("{}")
+  sourceChecksums  Json                     @default("{}")
+  validationSummary Json                    @default("{}")
+  downloadedAt     DateTime?
+  validatedAt      DateTime?
+  activatedAt      DateTime?
+  createdAt        DateTime                 @default(now())
+  createdById      String?
+
+  createdBy          User?                     @relation("TerminologyReleaseCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  drugConcepts       TerminologyDrugConcept[]
+  ingredientEdges    TerminologyIngredientEdge[]
+  safetyReleases     SafetyKnowledgeRelease[]
+  safetyEvaluations  SafetyEvaluation[]
+  importBatches      ClinicalImportBatch[]
+
+  @@index([status])
+  @@index([ccddVersion])
+}
+
+model TerminologyDrugConcept {
+  id                   String   @id @default(cuid())
+  terminologyReleaseId String
+  sourceSystem         String
+  sourceCode           String
+  sourceVersion        String
+  conceptKey           String
+  conceptType          String
+  preferredNameEn      String
+  preferredNameFr      String?
+  normalizedSearchName String
+  synonyms             Json     @default("[]")
+  clinicalDrugCode     String?
+  genericProductCode   String?
+  packagedProductCode  String?
+  snomedCode           String?
+  brandName            String?
+  strengthNumeratorValue Float?
+  strengthNumeratorUnit String?
+  strengthDenominatorValue Float?
+  strengthDenominatorUnit String?
+  doseFormCode         String?
+  doseFormDisplay      String?
+  routeCodes           String[] @default([])
+  routeDisplays        String[] @default([])
+  atcCodes             String[] @default([])
+  dinCodes             String[] @default([])
+  dpdDrugCodes         String[] @default([])
+  marketStatus         String?
+  manufacturerNames    String[] @default([])
+  isActive             Boolean  @default(true)
+  effectiveStart       DateTime?
+  effectiveEnd         DateTime?
+  replacedBySourceCode String?
+  rawSource            Json
+  createdAt            DateTime @default(now())
+
+  terminologyRelease TerminologyRelease @relation(fields: [terminologyReleaseId], references: [id], onDelete: Cascade)
+  asMedicationEdges  TerminologyIngredientEdge[] @relation("MedicationConcept")
+  asIngredientEdges  TerminologyIngredientEdge[] @relation("IngredientConcept")
+
+  @@unique([terminologyReleaseId, sourceSystem, sourceCode])
+  @@index([normalizedSearchName])
+  @@index([snomedCode])
+  @@index([conceptType])
+  @@index([isActive])
+}
+
+model TerminologyIngredientEdge {
+  id                   String   @id @default(cuid())
+  terminologyReleaseId String
+  medicationId         String
+  ingredientId         String
+  relationshipType     String
+  sourceRelationshipCode String?
+  ingredientRole       String   @default("ACTIVE")
+  basisOfStrength      Boolean?
+  strengthNumeratorValue Float?
+  strengthNumeratorUnit String?
+  strengthDenominatorValue Float?
+  strengthDenominatorUnit String?
+  relationshipGroup    Int?
+  provenanceSource     String
+  provenanceVersion    String
+  derivationMethod     String
+  isActive             Boolean  @default(true)
+  rawSource            Json
+  createdAt            DateTime @default(now())
+
+  terminologyRelease TerminologyRelease    @relation(fields: [terminologyReleaseId], references: [id], onDelete: Cascade)
+  medication         TerminologyDrugConcept @relation("MedicationConcept", fields: [medicationId], references: [id], onDelete: Cascade)
+  ingredient         TerminologyDrugConcept @relation("IngredientConcept", fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([terminologyReleaseId, medicationId, ingredientId, relationshipType, ingredientRole])
+  @@index([terminologyReleaseId, medicationId])
+  @@index([terminologyReleaseId, ingredientId])
+}
+
+// ─── Allergy Rule Engine ───────────────────────────────────────────────────────
+
+enum AllergyDatasetStatus {
+  ACTIVE
+  ARCHIVED
+  FAILED
+}
+
+model AllergyRuleDataset {
+  id               String               @id @default(cuid())
+  fileName         String
+  storedName       String
+  fileSize         Int
+  mimeType         String
+  status           AllergyDatasetStatus @default(ACTIVE)
+  isActive         Boolean              @default(false)
+  version          Int                  @default(1)
+  drugCount        Int                  @default(0)
+  classCount       Int                  @default(0)
+  validationStatus String               @default("pending")
+  parsingStatus    String               @default("pending")
+  validationErrors Json?
+  uploadedById     String
+  uploadedAt       DateTime             @default(now())
+  processedAt      DateTime?
+  archivedAt       DateTime?
+
+  uploadedBy User @relation("AllergyRuleUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([isActive])
+  @@index([uploadedAt])
+  @@index([status])
+}
+
+/// Platform-wide editable AI system prompts (Super Admin). No tenantId.
+model AiSystemPrompt {
+  id             String   @id @default(cuid())
+  key            String   @unique
+  name           String
+  description    String?
+  category       String
+  content        String   @db.Text
+  defaultContent String   @db.Text
+  modelHint      String?
+  sourceFile     String?
+  sortOrder      Int      @default(0)
+  updatedById    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  updatedBy User? @relation("AiPromptUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@index([sortOrder])
+}
+
+/// Singleton OpenAI / AI runtime settings (Super Admin). API key stays in env.
+model AiPlatformSettings {
+  id                   String   @id @default(cuid())
+  openaiModel          String   @default("gpt-5.6-terra")
+  openaiFastModel      String   @default("gpt-5.6-terra")
+  openaiEmbeddingModel String   @default("text-embedding-3-small")
+  temperatureDefault   Float    @default(0.1)
+  maxRetries           Int      @default(3)
+  timeoutSeconds       Int      @default(90)
+  updatedById          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  updatedBy User? @relation("AiSettingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+/// Platform-wide Doc Download Format templates (Super Admin).
+/// Controls Doc module cards, AI prompts, response schema, and PDF download layout.
+model DocumentFormatTemplate {
+  id                   String   @id @default(cuid())
+  key                  String   @unique
+  name                 String
+  shortName            String?
+  description          String   @db.Text
+  category             String
+  categoryLabel        String
+  bullets              Json
+  fileName             String
+  sortOrder            Int      @default(0)
+  actions              Json
+  aiPrompt             String   @db.Text
+  styleNotes           String?  @db.Text
+  exampleOutput        String   @db.Text
+  /// Editable PDF section layout used on preview/download
+  pdfLayout            Json?
+  /// Expected AI JSON fields for this document
+  responseSchema       Json?
+  defaultName          String
+  defaultShortName     String?
+  defaultDescription   String   @db.Text
+  defaultCategoryLabel String
+  defaultBullets       Json
+  defaultAiPrompt      String   @db.Text
+  defaultStyleNotes    String?  @db.Text
+  defaultExampleOutput String   @db.Text
+  defaultPdfLayout     Json?
+  defaultResponseSchema Json?
+  published            Boolean  @default(true)
+  updatedById          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  updatedBy User? @relation("DocFormatUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([category])
+  @@index([sortOrder])
+  @@index([published])
+}
+
+/// Super Admin QA workbook (48-pathway developer test pack or compatible Excel).
+model PathwayQaWorkbook {
+  id           String   @id @default(cuid())
+  fileName     String
+  sha256       String
+  byteSize     Int
+  sheetNames   String[] @default([])
+  caseCount    Int      @default(0)
+  conditionCount Int    @default(0)
+  permutationCount Int  @default(0)
+  parsed       Json
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  uploadedBy User          @relation("PathwayQaWorkbookUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  runs       PathwayQaRun[]
+
+  @@index([sha256])
+  @@index([uploadedById, createdAt])
+  @@index([createdAt])
+}
+
+/// One execution of a parsed workbook against a clinical pathway.
+model PathwayQaRun {
+  id                 String             @id @default(cuid())
+  workbookId         String
+  pathwayId          String
+  status             PathwayQaRunStatus @default(RUNNING)
+  matchedCondition   String?
+  matchScore         Float?
+  matchSuggestions   Json?
+  summary            Json?
+  results            Json?
+  errorMessage       String?            @db.Text
+  durationMs         Int?
+  createdById        String
+  startedAt          DateTime           @default(now())
+  finishedAt         DateTime?
+  createdAt          DateTime           @default(now())
+
+  workbook  PathwayQaWorkbook @relation(fields: [workbookId], references: [id], onDelete: Cascade)
+  pathway   ClinicalPathway   @relation(fields: [pathwayId], references: [id], onDelete: Cascade)
+  createdBy User              @relation("PathwayQaRunCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([pathwayId, createdAt])
+  @@index([workbookId])
+  @@index([createdById, createdAt])
+  @@index([status, createdAt])
+}
+
+/// Approved Renew condition library. Consultation-scoped mappings live in Consultation.renewPayload.
+model RenewCondition {
+  id                             String   @id @default(cuid())
+  code                           String   @unique
+  displayName                    String
+  category                       String?
+  description                    String?
+  codeSystem                     String?
+  externalCode                   String?
+  defaultEffectivenessQuestion   String?
+  commonForRenewal               Boolean  @default(true)
+  displayPriority                Int      @default(100)
+  active                         Boolean  @default(true)
+  version                        Int      @default(1)
+  effectiveDate                  DateTime?
+  retiredDate                    DateTime?
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+
+  aliases        RenewConditionAlias[]
+  indicationMaps RenewMedicationIndicationMap[]
+
+  @@index([active, displayPriority])
+  @@index([displayName])
+}
+
+model RenewConditionAlias {
+  id               String  @id @default(cuid())
+  conditionId      String
+  alias            String
+  normalizedAlias  String
+  active           Boolean @default(true)
+
+  condition RenewCondition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+
+  @@unique([conditionId, normalizedAlias])
+  @@index([normalizedAlias])
+}
+
+/// Curated medication ingredient → approved condition. medicationConceptId stores a normalized generic/brand key.
+model RenewMedicationIndicationMap {
+  id                         String   @id @default(cuid())
+  medicationConceptId        String
+  /// Spreadsheet ingredient_id (e.g. RAMIPRIL). Display/search key; matching uses medicationConceptId.
+  ingredientId               String?
+  drugName                   String?
+  conditionId                String
+  mappingStrength            String
+  rankingWeight              Decimal? @db.Decimal(6, 2)
+  suggestionRank             Int      @default(1)
+  commonIndication           Boolean  @default(true)
+  autoGroupAllowed           Boolean  @default(false)
+  alwaysRequireConfirmation  Boolean  @default(false)
+  active                     Boolean  @default(true)
+  version                    Int      @default(1)
+  ruleSetVersion             String   @default("live")
+  sourceBatchId              String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
+
+  condition   RenewCondition       @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+  sourceBatch ClinicalImportBatch? @relation(fields: [sourceBatchId], references: [id], onDelete: SetNull)
+
+  @@unique([medicationConceptId, conditionId])
+  @@index([medicationConceptId, active])
+  @@index([ingredientId, active])
+  @@index([sourceBatchId])
+}
+
+/// Governed CCDD medication concept ↔ SNOMED CT indication mapping (Approved Indications Repository).
+model MedicationIndicationMapping {
+  id                     String    @id @default(cuid())
+  /// Canonical CCDD concept code (TM / ingredient / NTP / MP).
+  medicationConceptId    String
+  medicationDisplayName  String
+  /// therapeutic_moiety | ingredient | ingredient_combination | clinical_drug | product
+  medicationMappingLevel String    @default("ingredient")
+  /// SNOMED CT concept id (numeric string).
+  indicationConceptId    String
+  indicationDisplayName  String
+  /// approved_indication | guideline_supported | off_label | other
+  relationshipType       String    @default("approved_indication")
+  /// CA | AB | BC | ON | …
+  jurisdiction           String    @default("CA")
+  sourceReferenceId      String?
+  sourceLabel            String?
+  /// approved | retired
+  status                 String    @default("approved")
+  mappingVersion         Int       @default(1)
+  notes                  String?   @db.VarChar(1000)
+  validFrom              DateTime  @default(now())
+  validTo                DateTime?
+  createdById            String?
+  updatedById            String?
+  approvedById           String?
+  retiredById            String?
+  retiredAt              DateTime?
+  /// Bridge to RenewCondition for Adapt/Renew resolver compatibility.
+  legacyConditionId      String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([status, jurisdiction])
+  @@index([medicationConceptId, status])
+  @@index([indicationConceptId, status])
+  @@index([relationshipType, status])
+  @@index([medicationMappingLevel, status])
+  @@index([updatedAt])
+  @@index([legacyConditionId])
+  @@map("medication_indication_mappings")
+}
+
+/// Review-queue candidate for a medication–indication relationship (not production truth).
+model MedicationIndicationCandidate {
+  id                         String    @id @default(cuid())
+  medicationConceptId        String
+  medicationDisplayName      String?
+  medicationMappingLevel     String    @default("ingredient")
+  indicationConceptId        String
+  indicationDisplayName      String
+  /// pharmacist_selection | automated_extraction | import | admin_added
+  sourceType                 String
+  sourceReferenceId          String?
+  jurisdiction               String    @default("CA")
+  relationshipTypeSuggested  String?
+  usageCount                 Int       @default(1)
+  firstSeenAt                DateTime  @default(now())
+  lastSeenAt                 DateTime  @default(now())
+  /// pending | accepted | rejected | merged
+  status                     String    @default("pending")
+  reviewedById               String?
+  reviewedAt                 DateTime?
+  reviewNotes                String?
+  promotedMappingId          String?
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  @@unique([medicationConceptId, medicationMappingLevel, indicationConceptId, jurisdiction])
+  @@index([status, lastSeenAt])
+  @@index([medicationConceptId, status])
+  @@index([indicationConceptId, status])
+  @@map("medication_indication_candidates")
+}
+
+/// Published Approved Indications repository release metadata.
+model MedicationIndicationRepositoryVersion {
+  id            String   @id @default(cuid())
+  versionCode   String   @unique
+  publishedAt   DateTime @default(now())
+  publishedById String?
+  changeSummary String?
+  /// draft | published
+  status        String   @default("published")
+  mappingsAdded Int      @default(0)
+  mappingsUpdated Int    @default(0)
+  mappingsRetired Int    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([publishedAt])
+  @@map("medication_indication_repository_versions")
+}
+
+/// Approved Renew monitoring input definitions. Consultation answers live in Consultation.renewPayload.
+model RenewMonitoringInput {
+  id                  String   @id @default(cuid())
+  code                String   @unique
+  label               String
+  inputType           String
+  valueShape          String
+  unit                String?
+  aliases             String[] @default([])
+  displayPriority     Int      @default(100)
+  /// Spreadsheet category: PATIENT_CONTEXT | VITAL | LAB | QUESTION
+  category            String?
+  /// Spreadsheet data_type: INTEGER | DECIMAL | TEXT | BOOLEAN | ENUM | DATE | COMPOSITE
+  dataType            String?
+  /// Approved renderer token: NUMBER_INPUT | TEXT_INPUT | SINGLE_SELECT | YES_NO | DATE_INPUT | LAB_INPUT | BP_INPUT
+  uiComponent         String?
+  allowDate           Boolean  @default(true)
+  allowNotAvailable   Boolean  @default(true)
+  /// Presentation-only conventional range. Never used as a safety threshold.
+  normalRangeDisplay  String?
+  active              Boolean  @default(true)
+  version             Int      @default(1)
+  ruleSetVersion      String   @default("live")
+  sourceBatchId       String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  rules               RenewMonitoringRule[]
+  sourceBatch         ClinicalImportBatch? @relation(fields: [sourceBatchId], references: [id], onDelete: SetNull)
+
+  @@index([active, displayPriority])
+  @@index([inputType, active])
+  @@index([sourceBatchId])
+}
+
+/// Published medication/indication → monitoring or patient-context requirement.
+model RenewMonitoringRule {
+  id                    String   @id @default(cuid())
+  /// Spreadsheet rule_id (e.g. RM001). Null on legacy starter rows.
+  ruleCode              String?
+  inputId               String
+  matchType             String
+  ingredientKey         String?
+  conditionCode         String?
+  /// CLASS | INGREDIENT
+  appliesToType         String?
+  /// Spreadsheet applies_to_id (ACE_INHIBITOR, METFORMIN)
+  appliesToId           String?
+  /// Spreadsheet indication_id (ANY, HTN, T2DM)
+  indicationId          String?
+  inputType             String?
+  requirementLevel      String   @default("RECOMMENDED")
+  freshnessDays         Int?
+  actionIfMissing       String   @default("REVIEW")
+  active                Boolean  @default(true)
+  version               Int      @default(1)
+  displayPriority       Int      @default(100)
+  triggerSourceCode     String?
+  triggerValue          String?
+  ruleSetVersion        String   @default("live")
+  sourceBatchId         String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  input       RenewMonitoringInput @relation(fields: [inputId], references: [id], onDelete: Cascade)
+  sourceBatch ClinicalImportBatch? @relation(fields: [sourceBatchId], references: [id], onDelete: SetNull)
+
+  @@index([ingredientKey, active])
+  @@index([conditionCode, active])
+  @@index([inputId, active])
+  @@index([ruleCode, ruleSetVersion])
+  @@index([appliesToType, appliesToId, active])
+  @@index([sourceBatchId])
+}
+
+/// Approved Renew-specific questions asked only when medication/indication makes them relevant.
+model RenewConditionalQuestion {
+  id               String   @id @default(cuid())
+  questionRuleId   String
+  appliesToType    String
+  appliesToId      String
+  indicationId     String
+  questionCode     String
+  questionText     String   @db.Text
+  responseType     String
+  triggerAnswer    String
+  actionOnTrigger  String
+  followupPrompt   String?  @db.Text
+  active           Boolean  @default(true)
+  ruleSetVersion   String   @default("live")
+  sourceBatchId    String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sourceBatch ClinicalImportBatch? @relation(fields: [sourceBatchId], references: [id], onDelete: SetNull)
+
+  @@unique([questionRuleId, ruleSetVersion])
+  @@index([questionCode, active])
+  @@index([appliesToType, appliesToId, active])
+  @@index([sourceBatchId])
+}
+
+/// Pinned Renew workflow-configuration release (collection rules, not clinical safety thresholds).
+model RenewConfigRelease {
+  id            String    @id @default(cuid())
+  releaseCode   String    @unique
+  status        String
+  notes         String?   @db.Text
+  publishedAt   DateTime?
+  publishedById String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  publishedBy User? @relation("RenewConfigPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+// ─── Clinical Safety — Reference & Target Values ───────────────────────────────
+
+enum ClinicalReferenceRecordStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  SUPERSEDED
+  ARCHIVED
+}
+
+enum ClinicalReferenceSourceStatus {
+  DRAFT
+  IN_REVIEW
+  ACTIVE
+  SUPERSEDED
+  ARCHIVED
+}
+
+/// Immutable published snapshot of governed reference/target values.
+model ClinicalReferenceRelease {
+  id            String                        @id @default(cuid())
+  releaseId     String                        @unique
+  versionLabel  String
+  status        ClinicalReferenceRecordStatus @default(DRAFT)
+  publishedAt   DateTime?
+  publishedById String?
+  notes         String?                       @db.Text
+  createdAt     DateTime                      @default(now())
+  updatedAt     DateTime                      @updatedAt
+
+  values    ClinicalReferenceValue[]
+  targets   ClinicalTreatmentTarget[]
+  pediatric ClinicalPediatricReferencePolicy[]
+  sources   ClinicalReferenceSource[]
+  pointer   ClinicalReferencePointer?
+
+  @@index([status])
+}
+
+model ClinicalReferencePointer {
+  id        String @id @default("active")
+  releaseId String @unique
+
+  release ClinicalReferenceRelease @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+}
+
+model ClinicalReferenceSource {
+  id              String                        @id @default(cuid())
+  sourceCode      String
+  versionNumber   Int                           @default(1)
+  sourceName      String
+  sourceType      String                        @default("OTHER")
+  publisher       String?
+  jurisdiction    String?
+  version         String?
+  publicationDate DateTime?
+  effectiveDate   DateTime?
+  sourceUrl       String?
+  lastReviewedAt  DateTime?
+  nextReviewDueAt DateTime?
+  useCase         String?                       @db.Text
+  notes            String?                       @db.Text
+  status           ClinicalReferenceSourceStatus @default(DRAFT)
+  reviewApprovedAt DateTime?
+  releaseId        String?
+  supersededById  String?
+  createdById     String?
+  updatedById     String?
+  createdAt       DateTime                      @default(now())
+  updatedAt       DateTime                      @updatedAt
+
+  release      ClinicalReferenceRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  supersededBy ClinicalReferenceSource?  @relation("ClinicalReferenceSourceSupersede", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   ClinicalReferenceSource[] @relation("ClinicalReferenceSourceSupersede")
+
+  @@unique([sourceCode, versionNumber])
+  @@index([sourceCode, status])
+  @@index([status])
+  @@index([releaseId])
+}
+
+model ClinicalReferenceValue {
+  id                String                        @id @default(cuid())
+  referenceId       String
+  versionNumber     Int                           @default(1)
+  inputCode         String
+  label             String
+  category          String?
+  population        String                        @default("ALL")
+  sex               String                        @default("ALL")
+  context           String?
+  referenceStrategy String
+  referenceKind     String
+  uiUse             String?
+  lowerNumeric      Float?
+  upperNumeric      Float?
+  operator          String?
+  targetValue       String?
+  unit              String?
+  displayText       String?
+  sourceCode        String?
+  sourcePriority    Int?
+  notes             String?                       @db.Text
+  status            ClinicalReferenceRecordStatus @default(DRAFT)
+  reviewApprovedAt  DateTime?
+  effectiveDate     DateTime?
+  releaseId         String?
+  supersededById    String?
+  createdById       String?
+  updatedById       String?
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+
+  release      ClinicalReferenceRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  supersededBy ClinicalReferenceValue?   @relation("ClinicalReferenceValueSupersede", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   ClinicalReferenceValue[]  @relation("ClinicalReferenceValueSupersede")
+
+  @@unique([referenceId, versionNumber])
+  @@index([inputCode, status])
+  @@index([status])
+  @@index([sourceCode])
+  @@index([releaseId])
+}
+
+model ClinicalTreatmentTarget {
+  id              String                        @id @default(cuid())
+  targetId        String
+  versionNumber   Int                           @default(1)
+  inputCode       String
+  label           String
+  population      String                        @default("ADULT")
+  clinicalContext String
+  parameter       String
+  operator        String?
+  targetValue     String?
+  unit            String?
+  displayText     String
+  sourceCode      String
+  targetType      String                        @default("TREATMENT_TARGET")
+  notes              String?                       @db.Text
+  status             ClinicalReferenceRecordStatus @default(DRAFT)
+  reviewApprovedAt   DateTime?
+  effectiveDate      DateTime?
+  releaseId          String?
+  supersededById     String?
+  createdById        String?
+  updatedById        String?
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+
+  release      ClinicalReferenceRelease? @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  supersededBy ClinicalTreatmentTarget?  @relation("ClinicalTreatmentTargetSupersede", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   ClinicalTreatmentTarget[] @relation("ClinicalTreatmentTargetSupersede")
+
+  @@unique([targetId, versionNumber])
+  @@index([inputCode, status])
+  @@index([status])
+  @@index([sourceCode])
+  @@index([releaseId])
+}
+
+model ClinicalPediatricReferencePolicy {
+  id                   String                        @id @default(cuid())
+  inputCode            String
+  versionNumber        Int                           @default(1)
+  label                String?
+  category             String?
+  strategy             String
+  preferredSource      String?
+  fallbackAllowed      Boolean                       @default(false)
+  adultFallbackAllowed Boolean                       @default(false)
+  implementationNote   String?                       @db.Text
+  sourceUrl            String?
+  status               ClinicalReferenceRecordStatus @default(DRAFT)
+  reviewApprovedAt     DateTime?
+  releaseId            String?
+  supersededById       String?
+  createdById          String?
+  updatedById          String?
+  createdAt            DateTime                      @default(now())
+  updatedAt            DateTime                      @updatedAt
+
+  release      ClinicalReferenceRelease?          @relation(fields: [releaseId], references: [id], onDelete: SetNull)
+  supersededBy ClinicalPediatricReferencePolicy?  @relation("ClinicalPediatricPolicySupersede", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes   ClinicalPediatricReferencePolicy[] @relation("ClinicalPediatricPolicySupersede")
+
+  @@unique([inputCode, versionNumber])
+  @@index([inputCode, status])
+  @@index([status])
+  @@index([releaseId])
+}

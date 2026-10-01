@@ -1,0 +1,10 @@
+class_name,parent_class,therapeutic_group,risk_tag
+penicillin,beta-lactam,antibiotic,allergy
+cephalosporin,beta-lactam,antibiotic,allergy
+macrolide,antibiotic,antibiotic,QT
+fluoroquinolone,antibiotic,antibiotic,tendon
+NSAID,anti-inflammatory,analgesic,renal GI allergy
+ACE inhibitor,RAAS inhibitor,cardiovascular,renal potassium
+SSRI,antidepressant,CNS,
+biguanide,antidiabetic,endocrine,renal
+tetracycline,antibiotic,antibiotic,

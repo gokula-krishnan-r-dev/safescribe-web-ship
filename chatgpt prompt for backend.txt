@@ -1,0 +1,265 @@
+Pathway name: {{PATHWAY_NAME}}
+Medical condition: {{MEDICAL_CONDITION}}
+Province / jurisdiction: {{PROVINCE_OR_JURISDICTION}}
+
+Treatment to generate: {{TREATMENT_NAME_OR_CLASS}}
+
+Audience: Canadian community pharmacists using SafeScribe clinical pathways.
+
+Tone: precise, guideline-aligned, clinically conservative.
+
+SOURCE PREFERENCE:
+- Prefer Canadian clinical guidance.
+- Prefer CPS, current Canadian product monographs, Health Canada-authorized product information, and applicable provincial pharmacist prescribing protocols.
+- Use indication-specific dosing whenever available.
+- Do not invent doses, product strengths, treatment durations, contraindications, interactions, monitoring requirements, renal adjustments, hepatic adjustments, or safety information.
+- Generate only treatments clinically appropriate for {{MEDICAL_CONDITION}}.
+- If {{TREATMENT_NAME_OR_CLASS}} identifies a specific medication or treatment, generate only that treatment unless explicitly instructed otherwise.
+
+TASK:
+Create a complete treatment record for Canadian pharmacist prescribing of {{MEDICAL_CONDITION}} using {{TREATMENT_NAME_OR_CLASS}}.
+
+Return ONLY markdown.
+
+Return one "## Treatment" block per requested treatment option.
+
+IMPORTANT FORMAT RULES:
+- Use the exact field names and exact field order below.
+- Put EVERY field on ONE physical line.
+- Do not use multiline bullets within any field.
+- Do not add introductory text, conclusions, tables, explanations, or notes outside the treatment block(s).
+- When a field contains several clinical instructions, separate them using semicolons.
+- Renal reason, Hepatic reason, Interactions, Counselling notes, Follow-up advice, and Warnings must each remain on one physical line.
+- Renal dosing rules must contain valid JSON on ONE physical line.
+- Structured regimen values must be directly importable into the SafeScribe treatment editor.
+- Do not put narrative clinical information into Dose, Frequency, Duration, Duration unit, Route, Product form, or Administration unit.
+- All structured regimen fields must be internally consistent.
+
+## Treatment
+Medication: [pharmacist-facing medication or treatment name including useful strength]
+Generic: [active ingredient / generic name; blank only when not applicable]
+Brand: [common Canadian brand when clinically useful; otherwise blank]
+Category: PRESCRIPTION | OTC | SUPPLEMENT | NON_DRUG
+Recommendation: FIRST_LINE | SECOND_LINE | ALTERNATIVE | ADJUNCTIVE | SUPPORTIVE_CARE
+Strength: [clinically appropriate marketed strength]
+Product form: Tablet | Capsule | Cream | Ointment | Gel | Foam | Solution | Drop | Spray | Nasal spray | Metered-dose inhaler | Patch | Suppository | Lozenge | Injection
+Dose: [numeric administered amount only]
+Administration unit: Tablet(s) | Capsule(s) | Application(s) | Drop(s) | Spray(s) | Puff(s) | Patch(es) | mL | Sachet(s) | Injection(s)
+Route: Oral | Topical | Ophthalmic | Otic | Nasal | Inhalation | Transdermal | Rectal | Intramuscular | Subcutaneous
+Frequency: Once daily | Twice daily (BID) | Three times daily (TID) | Four times daily (QID) | Five times daily | Every 4 hours | Every 6 hours | Every 8 hours | Every 12 hours | Single dose | Other
+Duration: [numeric value only]
+Duration unit: Days | Weeks | Months
+Quantity: [complete dispense quantity including unit]
+Directions: [complete patient-facing SIG matching the structured regimen]
+Clinical indication: [when this treatment is used for the current condition]
+Clinical rationale: [concise pharmacist-facing explanation of why this option is recommended]
+Eligibility: [appropriate patient criteria for this treatment]
+Age restriction: [specific age restriction when applicable]
+Province availability: ALL or AB,BC,MB,NB,NL,NS,NT,NU,ON,PE,QC,SK,YT
+Guideline reference: [relevant Canadian product monograph / CPS / applicable provincial protocol]
+Evidence: Strong | Moderate | Limited | Expert opinion
+Contraindications: [clinically important absolute or major relative contraindications]
+Interactions: [clinically important interactions only; include exact dose modification when an interaction changes the regimen]
+Pregnancy: Yes | No
+Pregnancy reason: [required when Pregnancy is Yes; concise pharmacist-facing explanation]
+Breastfeeding: Yes | No
+Breastfeeding reason: [required when Breastfeeding is Yes; concise pharmacist-facing explanation]
+Renal adjustment: Yes | No
+Renal source basis: CrCl | eGFR | OTHER | NONE
+Renal reason: [human-readable indication-specific eGFR renal dosing configuration; all tiers on one physical line separated by semicolons]
+Renal dosing basis: eGFR | NONE
+Renal dosing rules: [valid single-line JSON array containing SafeScribe eGFR dosing rules; use [] when no renal adjustment applies]
+Hepatic adjustment: Yes | No
+Hepatic reason: [exact indication-specific hepatic information when supported]
+Monitoring: Yes | No
+Monitoring reason: [clinically meaningful laboratory or measurable parameter monitoring only]
+Counselling notes: [key treatment-specific counselling points]
+Follow-up advice: [reassessment, treatment failure, recurrence, or clinical follow-up]
+Warnings: [clinically important warnings]
+
+TREATMENT SELECTION RULES:
+- Include only treatments relevant to {{MEDICAL_CONDITION}}.
+- Prefer treatments suitable for Canadian community-pharmacy practice and pharmacist prescribing where applicable.
+- Prefer Canadian generic names, brand names, and marketed strengths.
+- Respect applicable jurisdiction-specific pharmacist scope and product availability.
+- Do not add clinically marginal options simply to increase the number of treatments.
+- Recommendation level must reflect the treatment's actual place in therapy.
+
+STRUCTURED REGIMEN RULES:
+- Generate one clear primary regimen for each treatment.
+- Strength, Dose, Administration unit, Product form, Route, Frequency, Duration, Quantity, and Directions must agree.
+- Dose must contain the numeric administered amount only.
+- Example: Dose: 2 and Administration unit: Tablet(s).
+- Do NOT write Dose: 2 tablets.
+- Strength describes the product strength.
+- Dose describes the number of administration units per dosing event when the dosage form can be represented this way.
+- Duration must contain a numeric value only.
+- Duration unit must be supplied separately.
+- Do not put clinical prose into structured regimen fields.
+- Do not leave structured regimen fields blank when a standard regimen exists.
+- If a reliable regimen cannot be determined, omit the treatment rather than generating an unsupported regimen.
+
+FIXED-COURSE TREATMENTS:
+- For antibiotics and other fixed-course therapies, provide one definite standard dose, frequency, and duration.
+- Do not use vague ranges as the primary structured regimen when a standard regimen can reasonably be selected.
+- Pediatric, weight-based, alternate-strength, or alternate-duration information may be placed in Eligibility or Counselling notes when useful, but must not make the primary regimen ambiguous.
+
+ACUTE / PRN TREATMENTS:
+- Acute or traditionally PRN treatments must still have a complete structured regimen.
+- Use Duration: 1 and Duration unit: Days when the treatment is episodic and no longer course is standard.
+- Do not use As needed (PRN) as the structured Frequency.
+- Use the definite frequency that best represents the standard regimen.
+- The pharmacist may enable PRN status in the pharmacist-facing workflow.
+- For single-dose treatment use Frequency: Single dose, Duration: 1, Duration unit: Days.
+- Repeat-dose instructions belong in Directions.
+
+PATIENT DIRECTIONS:
+- Directions must exactly reflect the structured regimen.
+- Include timing, repeat-dose instructions, maximum dose, treatment limits, and administration instructions when clinically relevant.
+- Do not simplify Directions in a way that contradicts the structured regimen.
+- Do not duplicate the entire SIG unnecessarily in Counselling notes.
+
+CLINICAL RATIONALE:
+- Explain briefly why the treatment is first-line, alternative, adjunctive, or supportive.
+- Keep it concise and pharmacist-facing.
+- Do not simply repeat Clinical indication.
+
+RENAL DOSING POLICY:
+- SafeScribe uses eGFR as the operational renal dosing value.
+- Renal dosing basis must therefore be eGFR whenever structured renal adjustment is generated.
+- Renal source basis records the renal measure used by the underlying authoritative source.
+- If the authoritative source uses CrCl, set Renal source basis: CrCl.
+- If the authoritative source uses eGFR, set Renal source basis: eGFR.
+- If another renal metric is explicitly used, set Renal source basis: OTHER.
+- If no renal adjustment applies, set Renal source basis: NONE, Renal dosing basis: NONE, and Renal dosing rules: [].
+- Do not claim that the manufacturer used eGFR when the source actually used CrCl.
+- SafeScribe may operationalize supported adult renal dose-adjustment bands using eGFR for the pharmacist-facing workflow.
+- Renal reason must describe the pharmacist-facing eGFR thresholds and corresponding regimens.
+- Renal dosing rules must contain the same eGFR thresholds and corresponding regimens.
+- Use reported eGFR in mL/min/1.73 m² unless a pathway-specific validated rule states otherwise.
+- Include all clinically relevant eGFR thresholds and exact adjusted regimens when supported.
+- Include the normal-function regimen when useful for comparison.
+- Include hemodialysis instructions only when supported.
+- Do not invent dialysis instructions.
+- If renal function is rapidly changing, acute kidney injury is suspected, dialysis circumstances are uncertain, eGFR is close to a dosing threshold, or indexed eGFR may not appropriately represent clearance because of markedly unusual body size, state that pharmacist review is required.
+- Do not automatically extrapolate adult renal rules to pediatric patients unless validated pediatric renal dosing is available.
+- When an adjusted dose requires a different product strength, preserve the required clinical dose and require appropriate product selection rather than assuming the current product can be divided.
+
+RENAL REASON FORMAT:
+- Renal reason is HUMAN-READABLE.
+- Keep it on ONE physical line.
+- Separate each renal tier using semicolons.
+- Preferred format:
+Renal reason: eGFR ≥[threshold] mL/min/1.73 m²: [regimen]; eGFR [lower] to <[upper] mL/min/1.73 m²: [regimen]; eGFR <[threshold] mL/min/1.73 m²: [regimen]; Hemodialysis: [instruction if supported]; [special population / pharmacist-review instructions if applicable]
+
+STRUCTURED RENAL DOSING RULES:
+- Renal dosing rules are MACHINE-READABLE.
+- They power patient-specific renal dose recommendations in SafeScribe.
+- They must never automatically change the prescription.
+- A pharmacist must explicitly choose to apply the adjusted regimen.
+- Return valid JSON on ONE physical line.
+- Use JSON double quotes.
+- Do not use comments.
+- Use null for an unbounded minimum or maximum.
+- Use minInclusive and maxInclusive to represent exact boundaries.
+- Do not use artificial decimal boundaries such as 49.99 to represent <50.
+- Human-readable Renal reason and structured Renal dosing rules must contain identical eGFR thresholds and corresponding doses.
+- Do not generate structured rules from vague statements such as "reduce dose in renal impairment."
+- Only generate rules when a sufficiently definite adjustment can be supported.
+
+Each renal rule must use:
+
+{"min":number|null,"minInclusive":true|false,"max":number|null,"maxInclusive":true|false,"doseAmount":number,"doseUnit":"mg|mcg|g|mL|units","frequency":"SafeScribe-compatible frequency","duration":number,"durationUnit":"Days|Weeks|Months","totalDoses":number|null,"directions":"patient-facing adjusted SIG"}
+
+Example structure only:
+
+Renal dosing rules: [{"min":30,"minInclusive":true,"max":50,"maxInclusive":false,"doseAmount":1000,"doseUnit":"mg","frequency":"Twice daily (BID)","duration":1,"durationUnit":"Days","totalDoses":2,"directions":"Take 1000 mg by mouth every 12 hours for 2 doses."}]
+
+RENAL PRODUCT-STRENGTH SAFETY:
+- Structured renal rules describe the required clinical dose, not an assumed tablet count.
+- Do not convert an adjusted mg dose into a tablet fraction unless that exact product/formulation has validated splitting support.
+- If a different strength is required, retain the required dose in mg and state that an appropriate product strength must be selected.
+- A product-strength mismatch must not prevent SafeScribe from displaying the renal recommendation.
+- It must prevent automatic application until the pharmacist resolves product selection.
+
+PHARMACIST DECISION RULE:
+- SafeScribe may match patient eGFR to a structured renal rule.
+- SafeScribe may display the standard pathway regimen and recommended renal-adjusted regimen.
+- SafeScribe must NEVER silently alter the treatment.
+- The pharmacist must explicitly choose "Apply renal-adjusted regimen".
+- Only after pharmacist action may SafeScribe update Dose, product, Frequency, Duration, Quantity, Directions, and other linked prescription fields.
+- The pharmacist remains responsible for accepting, modifying, or declining the suggestion.
+- Preserve the standard pathway regimen so it can be restored if needed.
+
+HEPATIC DOSING:
+- If Hepatic adjustment is Yes, provide exact indication-specific adjustment when supported.
+- Include Child-Pugh category, maximum dose, avoidance recommendation, or contraindication threshold when available.
+- Keep multiple instructions on one physical line separated by semicolons.
+- Do not invent a numeric dose reduction when the source only says use with caution, not recommended, or contraindicated.
+- Do not generate structured hepatic JSON rules at this time.
+
+INTERACTIONS:
+- Include only clinically important interactions likely to affect prescribing, treatment selection, dosing, or monitoring.
+- Avoid long lists of minor theoretical interactions.
+- If an interaction requires a specific dose or interval modification, state the exact supported instruction.
+
+PREGNANCY / BREASTFEEDING:
+- Yes means a clinically relevant consideration requiring pharmacist attention.
+- Yes does not automatically mean contraindicated.
+- Distinguish compatible use, caution, individualized benefit-risk assessment, avoidance, and contraindication accurately.
+- Keep reasons concise and clinically useful.
+
+MONITORING:
+- Monitoring refers primarily to clinically meaningful laboratory or measurable parameter monitoring.
+- Do not set Monitoring: Yes solely for routine symptom response, treatment response, or generic adverse-effect monitoring.
+- Routine clinical reassessment belongs under Follow-up advice.
+- Appropriate examples include renal function, hepatic function, INR, electrolytes, glucose, blood pressure, drug levels, or another treatment-specific measurable parameter.
+
+COUNSELLING:
+- Include treatment-specific information useful for patient counselling.
+- May include administration technique, timing, food considerations, adherence, hydration, prevention, common important adverse effects, formulation instructions, or treatment limitations.
+- Do not duplicate the full SIG unnecessarily.
+- Do not include pathway red-flag questions.
+
+FOLLOW-UP:
+- State when treatment should be reassessed.
+- Include treatment failure, persistence, recurrence, or circumstances requiring additional clinical evaluation.
+- Do not duplicate routine red-flag screening from other pathway sections.
+
+SAFETY FLAGS:
+- Pregnancy: Yes requires Pregnancy reason.
+- Breastfeeding: Yes requires Breastfeeding reason.
+- Renal adjustment: Yes requires Renal source basis, Renal reason, Renal dosing basis, and Renal dosing rules when a definite adjustment is supported.
+- Hepatic adjustment: Yes requires Hepatic reason.
+- Monitoring: Yes requires Monitoring reason.
+- When a flag is No, the corresponding reason may be blank unless a useful explanation should be preserved.
+
+OUTPUT QUALITY CHECK:
+Before returning each treatment block verify:
+- Medication, Generic, Brand, and Strength are internally consistent.
+- Product form, Route, and Administration unit are compatible.
+- Dose and Strength produce the intended regimen.
+- Frequency and Duration are clinically appropriate.
+- Duration is numeric.
+- Duration unit is present.
+- Quantity is sufficient for the stated regimen where determinable.
+- Directions exactly match the structured regimen.
+- Repeat-dose and maximum-dose instructions are included when relevant.
+- Clinical rationale accurately describes place in therapy.
+- Eligibility and age restrictions are appropriate.
+- Province availability reflects {{PROVINCE_OR_JURISDICTION}}.
+- Contraindications and interactions contain clinically meaningful information without unnecessary alert noise.
+- Pregnancy and Breastfeeding flags indicate considerations rather than simplistic safe/unsafe classification.
+- Renal source basis accurately reflects the underlying source.
+- Renal dosing basis is eGFR whenever structured renal adjustment is generated.
+- Renal reason uses eGFR.
+- Renal dosing rules use eGFR.
+- Human-readable and structured eGFR thresholds match exactly.
+- Structured renal rules do not assume tablet splitting.
+- Pediatric renal rules are not extrapolated from adults without support.
+- Dialysis instructions are included only when supported.
+- Hepatic adjustment is indication-specific.
+- Monitoring is not being used for routine clinical response.
+- No structured regimen field contains narrative information belonging elsewhere.
+- Every field appears on exactly one physical line.
+- No unsupported dose, duration, strength, or safety information is invented.

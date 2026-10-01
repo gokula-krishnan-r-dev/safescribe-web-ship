@@ -1,0 +1,7 @@
+drug_a,drug_b,severity,description,action_required
+azithromycin,amiodarone,major,QT prolongation risk,hard_stop
+azithromycin,citalopram,major,additive QT prolongation,hard_stop
+azithromycin,ondansetron,major,additive QT prolongation,hard_stop
+ciprofloxacin,citalopram,major,QT prolongation risk,hard_stop
+ciprofloxacin,ondansetron,major,QT prolongation risk,hard_stop
+ciprofloxacin,prednisone,moderate,increased tendon rupture risk,pharmacist_review

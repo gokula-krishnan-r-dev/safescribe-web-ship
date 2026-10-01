@@ -1,0 +1,10 @@
+drug_name,class_name,ingredient,common_brand,notes
+amoxicillin,penicillin,amoxicillin,Amoxil,very common
+cephalexin,cephalosporin,cephalexin,Keflex,
+azithromycin,macrolide,azithromycin,Zithromax,QT risk
+ciprofloxacin,fluoroquinolone,ciprofloxacin,Cipro,tendon risk
+ibuprofen,NSAID,ibuprofen,Advil,renal/GI
+ramipril,ACE inhibitor,ramipril,Altace,renal/K+
+sertraline,SSRI,sertraline,Zoloft,
+metformin,biguanide,metformin,—,renal critical
+doxycycline,tetracycline,doxycycline,Vibramycin,acne RTI

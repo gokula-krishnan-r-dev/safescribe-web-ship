@@ -1,0 +1,4 @@
+drug_name,pregnancy_category,trimester,severity,recommendation,note,action_required
+isotretinoin,contraindicated,all,block,do not use,teratogenic,hard_stop
+warfarin,contraindicated,all,block,avoid,fetal bleeding risk,hard_stop
+ramipril,contraindicated,all,block,avoid,fetal renal damage,hard_stop

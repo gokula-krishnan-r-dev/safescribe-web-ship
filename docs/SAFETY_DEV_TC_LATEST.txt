@@ -1,0 +1,100 @@
+npm warn Unknown project config "neverBuiltDependencies". This will stop working in the next major version of npm.
+npm warn Unknown project config "onlyBuiltDependenciesFile". This will stop working in the next major version of npm.
+npm warn Unknown project config "dangerouslyAllowAllBuilds". This will stop working in the next major version of npm.
+=== Developer TC-01..TC-10 against https://api-staging.safescribe.ca/api/v1 ===
+release KR-2026.08.09.37 cache KR-2026.08.09.37 810
+pathways {
+  coldSore: 'Cold sores (oral herpes labialis)',
+  gerd: undefined,
+  acne: undefined
+}
+# Safety Engine Developer TC Results
+
+Ran: 2026-08-09T03:05:11.511Z
+Release: KR-2026.08.09.37 (cache rules: 810)
+Score: **4/10**
+
+| Case | Result | Kind | Summary |
+|---|---|---|---|
+| TC-01 | FAIL | DATA | engine:Acyclovir→CAUTION: got ALLOWED / consult:Valacyclovir (Valtrex®, generics)→CAUTION: got BLOCK (Patient has a recorded allergy to Docosanol.) / consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED: got BLOCK (Patient has a recorded allergy to Docosanol.) / consult:/^Acyclovir$/i: Medication not found in results. Available: Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate, Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics) |
+| TC-02 | FAIL | DATA | engine:Valacyclovir→BLOCK: got ALLOWED / consult:/^Acyclovir$/i: Medication not found in results. Available: Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate, Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics) / consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED: got BLOCK (Patient has a recorded allergy to Acyclovir.) |
+| TC-03 | FAIL | DATA | engine:Omeprazole→CAUTION: got ALLOWED / engine:Esomeprazole→CAUTION: got ALLOWED |
+| TC-04 | PASS | — | NSAIDs blocked for peptic ulcer; acetaminophen/antibiotic allowed (engine harness; no AOM pathway) |
+| TC-05 | FAIL | DATA | engine:Acyclovir→CAUTION: got ALLOWED / consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED: got CAUTION (The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes z) / consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED: got CAUTION (The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes z) |
+| TC-06 | FAIL | DATA | Acne pathway has no spironolactone card; engine: engine:Spironolactone→BLOCK=got ALLOWED |
+| TC-07 | PASS | — | ACEIs blocked in pregnancy; amlodipine not auto-blocked (engine harness) |
+| TC-08 | PASS | — | Codeine products blocked in lactation; plain acetaminophen/ibuprofen allowed |
+| TC-09 | FAIL | PATHWAY | consult:age gating for under-12: Adult regimens still selectable: Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics), Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate / scope:age rules in Safety Engine Excel: No age/product eligibility rules fired. Needs pathway age gates or Excel age rules. |
+| TC-10 | PASS | — | Cold sore pathway has ocular + immunocompromised red flags for referral workflow |
+
+
+TC-01 FAIL
+  ✓ engine:Docosanol 10% cream→BLOCK — Patient has a recorded allergy to Docosanol.
+  ✓ engine:Valacyclovir→CAUTION — The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with 
+  ✗ engine:Acyclovir→CAUTION — got ALLOWED
+  ✓ engine:Acyclovir 5% cream→ALLOWED
+  ✓ engine:metformin critical review — metformin finding present
+  ✓ consult:Docosanol 10% Cream (Abreva®, generics)→BLOCK — Patient has a recorded allergy to Docosanol.
+  ✗ consult:Valacyclovir (Valtrex®, generics)→CAUTION — got BLOCK (Patient has a recorded allergy to Docosanol.)
+  ✗ consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED — got BLOCK (Patient has a recorded allergy to Docosanol.)
+  ✗ consult:/^Acyclovir$/i — Medication not found in results. Available: Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate, Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics)
+
+TC-02 FAIL
+  ✓ engine:Acyclovir→BLOCK — Patient has a recorded allergy to Acyclovir.
+  ✓ engine:Acyclovir 5% cream→BLOCK — Patient has a recorded allergy to Acyclovir.
+  ✗ engine:Valacyclovir→BLOCK — got ALLOWED
+  ✓ engine:Docosanol 10% cream→ALLOWED
+  ✓ engine:Famciclovir→ALLOWED
+  ✗ consult:/^Acyclovir$/i — Medication not found in results. Available: Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate, Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics)
+  ✓ consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→BLOCK — Patient has a recorded allergy to Acyclovir.
+  ✓ consult:Valacyclovir (Valtrex®, generics)→BLOCK — Patient has a recorded allergy to Acyclovir.
+  ✗ consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED — got BLOCK (Patient has a recorded allergy to Acyclovir.)
+
+TC-03 FAIL
+  ✗ engine:Omeprazole→CAUTION — got ALLOWED
+  ✗ engine:Esomeprazole→CAUTION — got ALLOWED
+  ✓ engine:Pantoprazole→ALLOWED
+  ✓ engine:Famotidine→ALLOWED
+
+TC-04 PASS
+  ✓ engine:Ibuprofen→BLOCK — Active peptic ulcer disease matches the governed condition rule and the selected medication is in the published systemic NSAID value set. Select an alternative 
+  ✓ engine:Naproxen→BLOCK — Active peptic ulcer disease matches the governed condition rule and the selected medication is in the published systemic NSAID value set. Select an alternative 
+  ✓ engine:Acetaminophen→ALLOWED
+  ✓ engine:Amoxicillin→ALLOWED
+
+TC-05 FAIL
+  ✓ engine:Valacyclovir→CAUTION — The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with 
+  ✗ engine:Acyclovir→CAUTION — got ALLOWED
+  ✓ engine:Acyclovir 5% cream→ALLOWED
+  ✓ engine:Docosanol 10% cream→ALLOWED
+  ✓ consult:Valacyclovir (Valtrex®, generics)→CAUTION — The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes zoster. Compare the current regimen with 
+  ✗ consult:Acyclovir 5% Cream (Zovirax® Cream, generics)→ALLOWED — got CAUTION (The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes z)
+  ✗ consult:Docosanol 10% Cream (Abreva®, generics)→ALLOWED — got CAUTION (The patient's verified absolute creatinine clearance is in the 10 to below 30 range and the indication is adult herpes z)
+
+TC-06 FAIL
+  ✗ engine:Spironolactone→BLOCK — got ALLOWED
+  ✓ engine:Benzoyl peroxide→ALLOWED
+  ✓ engine:Clindamycin→ALLOWED
+
+TC-07 PASS
+  ✓ engine:Ramipril→BLOCK — A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immediate prescriber review.
+  ✓ engine:Lisinopril→BLOCK — A systemic ACE inhibitor has matched a confirmed pregnancy. Do not initiate or renew without immediate prescriber review.
+  ✓ engine:Amlodipine→ALLOWED
+
+TC-08 PASS
+  ✓ engine:Acetaminophen/caffeine/codeine→BLOCK — Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occur in a breastfed infant.
+  ✓ engine:Tylenol with Codeine No. 3→BLOCK — Codeine exposure is unpredictable because maternal metabolism varies; serious opioid effects may occur in a breastfed infant.
+  ✓ engine:Acetaminophen→ALLOWED
+  ✓ engine:Ibuprofen→ALLOWED
+
+TC-09 FAIL
+  ✗ consult:age gating for under-12 — Adult regimens still selectable: Valacyclovir (Valtrex®, generics), Acyclovir 5% Cream (Zovirax® Cream, generics), Acyclovir Oral (Zovirax®, generics), Famciclovir (Famvir®, generics), Acyclovir 5% / Hydrocortisone 1% Cream (Xerese®), Docosanol 10% Cream (Abreva®, generics), Lemon Balm Cream (Melissa officinalis), Lysine, Propolis / Bee Product Topical Preparation, Topical Zinc Preparation, Oral Zinc Sulfate
+  ✗ scope:age rules in Safety Engine Excel — No age/product eligibility rules fired. Needs pathway age gates or Excel age rules.
+
+TC-10 PASS
+  ✓ pathway:ocular red flag exists — found
+  ✓ pathway:immunocompromised red flag exists — found
+  ✓ red-flags:screen endpoint — HTTP 200
+  ✓ consult:treatment cards after urgent referral intent — 11 cards returned (referral short-circuit is UI/workflow; API still lists catalog)
+
+Repo test-run: {"status":200,"data":{"runId":"run-1786244710673","total":100,"passed":24,"failed":76,"criticalFailed":62,"highFailed":14,"results":[{"testCaseId":"TC-ACR-001","suiteVersion":"1.0-draft","priority":"P0","passed":false,"failures":["expected_raw_match_count=1 actual=0","expected_deduplicated_finding_count=1 actual=0","expected_primary_rule_code=SS-ACR-BL-AMOX-CEFADROXIL-IMM but no findings","POSITIVE_MATCH allergy scenario produced no findings"],"actual":{"rawMatchCount":0,"deduplicatedFindingCoun

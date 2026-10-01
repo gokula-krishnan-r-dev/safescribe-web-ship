@@ -1,0 +1,177 @@
+name: Staging Deploy
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+    inputs:
+      deploy_api:
+        description: Deploy NestJS API
+        type: boolean
+        default: true
+      deploy_ai:
+        description: Deploy Python AI engine
+        type: boolean
+        default: true
+      deploy_web:
+        description: Deploy Next.js to Vercel
+        type: boolean
+        default: true
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      ai: ${{ steps.filter.outputs.ai }}
+      web: ${{ steps.filter.outputs.web }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+              - 'prisma/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'infra/staging/pm2/**'
+              - 'infra/staging/scripts/deploy-api.sh'
+            ai:
+              - 'apps/ai-engine/**'
+              - 'infra/staging/systemd/**'
+              - 'infra/staging/scripts/deploy-ai.sh'
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+            infra:
+              - 'infra/staging/**'
+              - '.github/workflows/staging.yml'
+
+  deploy-web:
+    name: Deploy frontend (Vercel)
+    needs: changes
+    if: |
+      always() && !cancelled() &&
+      (github.event_name == 'workflow_dispatch' && inputs.deploy_web == true ||
+       github.event_name == 'push' && (needs.changes.outputs.web == 'true' || needs.changes.outputs.infra == 'true'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      - name: Pull Vercel env
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NEXT_PUBLIC_API_URL: https://api-staging.safescribe.ca
+      - name: Deploy prebuilt
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          vercel alias set "$url" staging.safescribe.ca --token=${{ secrets.VERCEL_TOKEN }} || true
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  deploy-backend:
+    name: Deploy API + AI (GCP VM)
+    needs: changes
+    if: |
+      always() && !cancelled() &&
+      (github.event_name == 'workflow_dispatch' && (inputs.deploy_api == true || inputs.deploy_ai == true) ||
+       github.event_name == 'push' && (needs.changes.outputs.api == 'true' || needs.changes.outputs.ai == 'true' || needs.changes.outputs.infra == 'true'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.STAGING_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Decide targets
+        id: targets
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "api=${{ inputs.deploy_api }}" >> "$GITHUB_OUTPUT"
+            echo "ai=${{ inputs.deploy_ai }}" >> "$GITHUB_OUTPUT"
+          else
+            api=false; ai=false
+            [[ "${{ needs.changes.outputs.api }}" == "true" || "${{ needs.changes.outputs.infra }}" == "true" ]] && api=true
+            [[ "${{ needs.changes.outputs.ai }}" == "true" || "${{ needs.changes.outputs.infra }}" == "true" ]] && ai=true
+            echo "api=$api" >> "$GITHUB_OUTPUT"
+            echo "ai=$ai" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sync + deploy
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_USER }}
+          DEPLOY_KEY: ${{ github.workspace }}/.ssh-deploy-key
+        run: |
+          mkdir -p "$(dirname "$DEPLOY_KEY")"
+          cp ~/.ssh/deploy_key "$DEPLOY_KEY"
+          chmod +x infra/staging/scripts/remote-deploy.sh
+          ARGS=()
+          [[ "${{ steps.targets.outputs.api }}" == "true" ]] && ARGS+=(--api)
+          [[ "${{ steps.targets.outputs.ai }}" == "true" ]] && ARGS+=(--ai)
+          if [[ ${#ARGS[@]} -eq 0 ]]; then
+            echo "Nothing to deploy"
+            exit 0
+          fi
+          ./infra/staging/scripts/remote-deploy.sh "${ARGS[@]}"
+
+      - name: Public health checks
+        if: success()
+        run: |
+          set -e
+          for i in 1 2 3 4 5; do
+            curl -fsS --max-time 20 https://api-staging.safescribe.ca/api/v1/health && break
+            sleep 5
+          done
+          curl -fsS --max-time 20 https://ai-staging.safescribe.ca/health
+          echo
+          echo "Public health OK"
+
+  summary:
+    name: Staging summary
+    needs: [changes, deploy-web, deploy-backend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write summary
+        run: |
+          {
+            echo "## Staging deploy"
+            echo ""
+            echo "| Component | Result |"
+            echo "|-----------|--------|"
+            echo "| Changes API | \`${{ needs.changes.outputs.api }}\` |"
+            echo "| Changes AI | \`${{ needs.changes.outputs.ai }}\` |"
+            echo "| Changes Web | \`${{ needs.changes.outputs.web }}\` |"
+            echo "| Web job | \`${{ needs.deploy-web.result }}\` |"
+            echo "| Backend job | \`${{ needs.deploy-backend.result }}\` |"
+            echo ""
+            echo "- Frontend: https://staging.safescribe.ca"
+            echo "- API: https://api-staging.safescribe.ca/api/v1/health"
+            echo "- AI: https://ai-staging.safescribe.ca/health"
+          } >> "$GITHUB_STEP_SUMMARY"

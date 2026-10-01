@@ -1,0 +1,5 @@
+drug_name,egfr_min,egfr_max,severity,recommendation,note,action_required
+metformin,0,29,block,contraindicated,lactic acidosis risk,hard_stop
+metformin,30,44,caution,reduce dose / review,reduced clearance,pharmacist_review
+metformin,45,999,safe,standard dosing,—,none
+ibuprofen,0,29,block,avoid,AKI risk,hard_stop

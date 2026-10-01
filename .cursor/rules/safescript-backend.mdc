@@ -1,0 +1,60 @@
+---
+description: NestJS API conventions for SafeScribe
+globs: apps/api/**/*
+alwaysApply: false
+---
+
+# SafeScribe Backend (NestJS)
+
+## Module Structure
+
+```
+apps/api/src/
+├── modules/
+│   ├── auth/          # JWT, refresh, MFA, sessions, lockout
+│   ├── users/
+│   ├── tenants/
+│   ├── roles/
+│   ├── permissions/
+│   ├── audit/
+│   ├── sessions/
+│   └── health/
+├── common/
+│   ├── guards/        # JwtAuthGuard, RolesGuard, PermissionsGuard, TenantGuard
+│   ├── decorators/    # @CurrentUser(), @TenantId(), @RequirePermissions()
+│   ├── filters/       # Global exception filter
+│   ├── interceptors/  # Audit interceptor
+│   └── middleware/    # Tenant resolution
+└── config/            # Validated env (class-validator)
+```
+
+## Patterns
+
+- **Tenant middleware** resolves tenant from JWT/header; inject into request context. Every service method receives `tenantId` for scoped Prisma queries.
+- **Guards stack**: `JwtAuthGuard` → `TenantGuard` → `RolesGuard` / `PermissionsGuard`.
+- **DTOs**: class-validator + class-transformer. Never expose password hashes or refresh tokens in responses.
+- **Passwords**: `argon2` hash/verify only. Never bcrypt for new code.
+- **Tokens**: Short-lived access JWT; refresh token rotation with Redis blacklist on logout/revoke.
+- **Rate limiting**: `@nestjs/throttler` on auth endpoints; stricter on login/forgot-password.
+- **Audit**: Use `AuditService.log()` in services or an interceptor — never skip for CRUD or auth events.
+- **Pagination**: Cursor or offset with `page`, `limit`, `sortBy`, `sortOrder`, `search`, `filters` query params. Return `{ data, meta: { total, page, limit } }`.
+- **Errors**: Consistent `{ statusCode, message, error }`. Log server errors; never leak stack traces in production.
+- **Swagger**: `@ApiTags`, `@ApiBearerAuth` on all protected controllers.
+
+## Super Admin vs Tenant Admin
+
+```typescript
+// Super Admin: tenantId may be null; can query across tenants
+// Pharmacist Admin: tenantId required; Prisma where: { tenantId }
+async findPharmacists(tenantId: string, query: ListQueryDto) {
+  return this.prisma.user.findMany({
+    where: { tenantId, role: { name: 'PHARMACIST' }, ...buildFilters(query) },
+    skip: (query.page - 1) * query.limit,
+    take: query.limit,
+  });
+}
+```
+
+## Background Jobs
+
+BullMQ + Redis for email (verification, reset), async audit writes if needed. OTP/MFA codes in Redis with TTL.

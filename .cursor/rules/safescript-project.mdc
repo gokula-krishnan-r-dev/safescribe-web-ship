@@ -1,0 +1,68 @@
+---
+description: SafeScribe project architecture, domain context, phase scope, and build standards
+alwaysApply: true
+---
+
+# SafeScribe — Project Rule
+
+SafeScribe is a **pharmacist clinical operating system** (Rx Now). Pharmacists stay in control; AI assists; rules govern. Domain reference: `SafeScribe is a pharmacist clinical operating syst 3870f1e4243780f29494efc6023da745.md`.
+
+## Monorepo Layout
+
+```
+apps/web/     → Next.js (App Router) admin panel & portals
+apps/api/     → NestJS REST API
+packages/     → Shared types, validators, constants
+prisma/       → Schema, migrations, seeds
+docker/       → Compose (PostgreSQL, Redis, Mail)
+```
+
+## Architecture (Non-Negotiable)
+
+- **Multi-tenant**: Every major entity has `tenantId`. All queries scoped to tenant. No cross-tenant data leaks.
+- **RBAC**: Super Admin → Pharmacist Admin → Pharmacist. Permission-based guards on every protected route.
+- **Audit everything**: Login, logout, failed login, CRUD, password/MFA changes, session revocation. Log: userId, tenantId, action, module, timestamp, IP, userAgent, device, previousValue, newValue.
+- **Security**: Argon2 passwords, JWT + refresh token rotation, Redis session/blacklist, rate limiting, Helmet, input validation, secure httpOnly cookies.
+- **Incremental phases**: Complete and test each phase before advancing. Do not build Phase 4 features during Phase 1–3.
+
+## User Roles
+
+| Role | Scope |
+|------|-------|
+| Super Admin | Platform-wide; static credentials; manages Pharmacist Admins & tenants |
+| Pharmacist Admin | Own organization only; manages pharmacists, roles, pathways, documents |
+| Pharmacist | End user; consultations, documents, profile; no admin access |
+
+## Current Phase Scope (Build Only This)
+
+1. Auth system (login, logout, forgot/reset/change password, MFA-ready, sessions, lockout, rate limit)
+2. Super Admin dashboard + Pharmacist Admin CRUD (search, filter, pagination, sort, bulk actions, suspend/activate)
+3. Pharmacist Admin → Pharmacist CRUD (tenant-scoped, export, reset password, login history)
+4. Protected dashboard layouts per role
+5. Audit logging for all auth and CRUD operations
+
+**Defer**: Clinical pathways, consultations, documents, analytics, AI/scribe — unless explicitly requested.
+
+## UI/UX
+
+- **Shadcn/UI** + Tailwind; light mode; premium enterprise feel (inspired by Heidi screenshot, not copied).
+- Dynamic primary accent from single CSS/config variable.
+- Rounded corners, soft shadows, skeleton loaders, empty states, toasts, confirmation dialogs for destructive actions.
+- Data tables: server-side pagination, search, filters, sorting, responsive.
+
+## Dev Environment
+
+Makefile commands: install, dev, build, test, migrate, seed, format, lint, prisma generate, db reset. Docker Compose for Postgres, Redis, Mail. `.env.example` for all apps.
+
+## Code Quality
+
+- TypeScript strict everywhere. Zod validation on API boundaries and forms.
+- Feature-based folders (`features/auth`, `features/users`). Reuse before duplicating.
+- Minimize scope per PR/task. Match existing conventions. No over-engineering.
+- Test critical paths (auth, tenant isolation, RBAC). Swagger on API.
+
+## When Unsure
+
+1. Read the domain doc first.
+2. Enforce tenant isolation and audit logging.
+3. Ask before expanding scope beyond current phase.

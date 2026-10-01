@@ -1,0 +1,25 @@
+node_modules
+dist
+.next
+.env
+.env.local
+*.log
+.DS_Store
+coverage
+.turbo
+__pycache__/
+*.pyc
+.venv/
+
+# Staging / production secrets & deploy keys
+infra/staging/secrets/
+infra/production/secrets/
+.vercel
+apps/web/.vercel
+# Local GCP service-account keys (never commit)
+rxnowapp-*.json
+*-sa.json
+*credentials*.json
+
+# Local API uploads (never commit patient files)
+apps/api/uploads/

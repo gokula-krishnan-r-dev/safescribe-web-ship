@@ -1,0 +1,37 @@
+{
+  "name": "safescript",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm db:migrate:deploy && concurrently \"pnpm --filter @safescript/api dev\" \"pnpm --filter @safescript/web dev\"",
+    "build": "pnpm --filter @safescript/shared build && pnpm --filter @safescript/api build && pnpm --filter @safescript/web build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed:renew-workflow": "tsx --tsconfig apps/api/tsconfig.json apps/api/src/scripts/seed-renew-workflow.ts",
+    "db:seed:approved-indications": "tsx --tsconfig apps/api/tsconfig.json apps/api/src/scripts/seed-approved-indications.ts",
+    "db:seed:clinical-references": "tsx --tsconfig apps/api/tsconfig.json apps/api/src/scripts/seed-clinical-references.ts",
+    "db:reset": "prisma migrate reset --force",
+    "db:studio": "prisma studio",
+    "phix:migrate": "tsx apps/api/src/scripts/migrate-phix-users.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "concurrently": "^9.1.0",
+    "dotenv": "^16.4.7",
+    "playwright": "^1.62.1",
+    "prettier": "^3.4.2",
+    "prisma": "^6.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "argon2": "^0.41.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
